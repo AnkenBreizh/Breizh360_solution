@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>Suivi de collaboration — Solution</title>
+<style>
+    :root{
+      --bg:#0b1020;
+      --text:#e9eefc;
+      --muted:#a9b7e6;
+      --border:#22305c;
+
+      --done:#1f7a3a;
+      --todo:#b54747;
+      --wip:#b07a1a;
+      --req:#2b66c9;
+
+      --shadow: 0 10px 24px rgba(0,0,0,.35);
+      --radius: 14px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background: radial-gradient(1200px 600px at 20% 10%, #1a2452 0%, var(--bg) 50%) fixed;
+      color:var(--text);
+      line-height:1.45;
+    }
+    .wrap{ max-width:1100px; margin:26px auto 60px; padding:0 16px; }
+    h1{ margin:0; font-size:22px; }
+    .sub{ margin:6px 0 0; color:var(--muted); font-size:13px; }
+
+    .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .hd{
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    .bd{ padding: 14px; }
+
+    .legend{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 10px;
+      border:1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+      font-size: 12px;
+      user-select:none;
+    }
+    .dot{ width:9px; height:9px; border-radius:999px; display:inline-block; background:#888; }
+    .dot.todo{ background: var(--todo); }
+    .dot.wip{ background: var(--wip); }
+    .dot.done{ background: var(--done); }
+    .dot.req{ background: var(--req); }
+
+    .badge{
+      display:inline-flex; align-items:center;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      color:#fff;
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.06);
+      white-space: nowrap;
+    }
+    .badge.todo{ background: rgba(181,71,71,.95); }
+    .badge.wip{ background: rgba(176,122,26,.95); }
+    .badge.done{ background: rgba(31,122,58,.95); }
+    .badge.req{ background: rgba(43,102,201,.95); }
+
+    /* Onglets (CSS uniquement) */
+    .tabs{ margin-top: 14px; }
+    .tabinputs{ display:none; }
+    .tabbar{
+      display:flex; flex-wrap:wrap; gap:8px;
+      padding: 10px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,.02);
+      position: sticky; top: 0; z-index: 5;
+      backdrop-filter: blur(10px);
+    }
+    .tabbar label{
+      cursor:pointer; user-select:none;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .tabcontent{ display:none; padding: 14px; }
+
+    /* Onglet actif (style du bouton) */
+    #t_vue:checked ~ .tabbar label[for="t_vue"],
+    #t_demandes:checked ~ .tabbar label[for="t_demandes"],
+    #t_domaine:checked ~ .tabbar label[for="t_domaine"],
+    #t_donnees:checked ~ .tabbar label[for="t_donnees"],
+    #t_metier:checked ~ .tabbar label[for="t_metier"],
+    #t_api:checked ~ .tabbar label[for="t_api"],
+    #t_gateway:checked ~ .tabbar label[for="t_gateway"],
+    #t_ui:checked ~ .tabbar label[for="t_ui"],
+    #t_tests:checked ~ .tabbar label[for="t_tests"]{
+      background: rgba(185,211,255,.16);
+      color: var(--text);
+      border-color: rgba(185,211,255,.35);
+    }
+
+    /* Contenu affiché */
+    #t_vue:checked ~ #c_vue,
+    #t_demandes:checked ~ #c_demandes,
+    #t_domaine:checked ~ #c_domaine,
+    #t_donnees:checked ~ #c_donnees,
+    #t_metier:checked ~ #c_metier,
+    #t_api:checked ~ #c_api,
+    #t_gateway:checked ~ #c_gateway,
+    #t_ui:checked ~ #c_ui,
+    #t_tests:checked ~ #c_tests{
+      display:block;
+    }
+
+    /* Tâches */
+    .tasklist{ display:flex; flex-direction:column; gap:10px; }
+    .task{
+      display:flex; gap:10px; align-items:flex-start;
+      padding: 10px 12px;
+      background: rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius: 12px;
+    }
+    .task .meta{ flex:1; min-width: 260px; }
+    .task .name{ margin:0; font-size: 14px; }
+    .task .desc{ margin:4px 0 0; font-size: 12.5px; color: var(--muted); }
+    .task .right{ display:flex; flex-direction:column; align-items:flex-end; gap:8px; min-width: 190px; }
+    .small{ font-size:12px; color: var(--muted); }
+
+    .table{
+      width:100%;
+      border-collapse: collapse;
+      border-radius: 12px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .table th, .table td{
+      padding: 10px 10px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      font-size: 13px;
+      vertical-align: top;
+    }
+    .table th{
+      text-align:left;
+      color: var(--muted);
+      background: rgba(255,255,255,.03);
+      font-weight: 600;
+    }
+    .table tr:last-child td{ border-bottom:0; }
+
+    .note{
+      padding: 10px 12px;
+      border:1px dashed rgba(255,255,255,.18);
+      border-radius: 12px;
+      background: rgba(0,0,0,.18);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media print{
+      body{ background:#fff; color:#000; }
+      .panel, .task, .note { box-shadow:none; background:#fff; }
+      .tabbar{ position: static; backdrop-filter:none; }
+      .badge{ color:#000; background:#eee; border-color:#bbb; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+<div class="panel">
+<div class="hd">
+<div>
+<h1>Suivi de collaboration — Solution</h1>
+<p class="sub">Fichier HTML unique (sans JavaScript). Pour partager l’avancement : modifiez ce fichier dans Visual Studio, puis commit dans Git.</p>
+</div>
+<div class="small"><strong>Dernière mise à jour :</strong> 07 / 01 / 2026</div>
+</div>
+<div class="bd">
+<div aria-label="Légende" class="legend">
+<span class="chip"><span class="dot todo"></span>À faire</span>
+<span class="chip"><span class="dot wip"></span>En cours</span>
+<span class="chip"><span class="dot done"></span>Terminé</span>
+<span class="chip"><span class="dot req"></span>Demande / Dépendance</span>
+</div>
+</div>
+</div>
+<div class="panel tabs">
+<input checked="" class="tabinputs" id="t_vue" name="tabs" type="radio"/>
+<input class="tabinputs" id="t_demandes" name="tabs" type="radio"/>
+<input class="tabinputs" id="t_domaine" name="tabs" type="radio"/>
+<input class="tabinputs" id="t_donnees" name="tabs" type="radio"/>
+<input class="tabinputs" id="t_metier" name="tabs" type="radio"/>
+<input class="tabinputs" id="t_api" name="tabs" type="radio"/>
+<input class="tabinputs" id="t_gateway" name="tabs" type="radio"/>
+<input class="tabinputs" id="t_ui" name="tabs" type="radio"/>
+<input class="tabinputs" id="t_tests" name="tabs" type="radio"/>
+<div aria-label="Onglets" class="tabbar" role="tablist">
+<label for="t_vue">Vue générale</label>
+<label for="t_demandes">Demandes inter-équipes</label>
+<label for="t_domaine">Domaine</label>
+<label for="t_donnees">Données</label>
+<label for="t_metier">Métier</label>
+<label for="t_api">API Métier</label>
+<label for="t_gateway">Passerelle</label>
+<label for="t_ui">Interface utilisateur</label>
+<label for="t_tests">Tests</label>
+</div>
+<section class="tabcontent" id="c_vue" role="tabpanel">
+<div class="note" style="margin-bottom:12px;">
+<strong>Règles :</strong>
+1) Chaque tâche a un ID.
+2) “Terminé” = <em>une remise</em> (chemin fichier, doc, PR).
+3) Ordre de réalisation : Domaine → Données → Métier → API → Passerelle → UI (+ Tests).
+<br/><strong>Note :</strong> l’API Métier est l’autorité pour la validation JWT (la Passerelle ne fait que filtrer/proxifier).
+Ports : Gateway 5000/5001, API 5100/5101.
+</div>
+<table aria-label="Initiatives" class="table">
+<thead>
+<tr>
+<th style="width:120px;">Initiative</th>
+<th>Résumé</th>
+<th style="width:200px;">Dépendances</th>
+<th style="width:130px;">Statut</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>INIT-000</strong></td>
+<td>Socle solution : conventions, structure de la solution, déploiement IIS (2 sites), Passerelle (reverse proxy), CI (build + tests).</td>
+<td>Aucune (pré-requis global)</td>
+<td><span class="badge todo">À faire</span></td>
+</tr>
+<tr>
+<td><strong>INIT-001</strong></td>
+<td>Authentification &amp; autorisations (JWT + RBAC/ABAC + refresh tokens).</td>
+<td>INIT-000 + Domaine → Données → Métier → API → Passerelle → UI</td>
+<td><span class="badge wip">En cours</span></td>
+</tr>
+<tr>
+<td><strong>INIT-002</strong></td>
+<td>Entités métier principales (à compléter).</td>
+<td>INIT-000 + Domaine → Données → Métier → API → Passerelle → UI</td>
+<td><span class="badge todo">À faire</span></td>
+</tr>
+</tbody>
+</table>
+<div class="note" style="margin-top:12px;">
+<strong>INIT-000 — Socle solution (pré-requis)</strong>
+<ul style="margin:8px 0 0 18px;">
+<li><strong>Objectif :</strong> rendre la solution exécutable localement (VS + IIS Express) et déployable sur IIS (intranet) de façon reproductible.</li>
+<li><strong>Périmètre :</strong> structure des projets &amp; conventions, configuration (appsettings + variables d’env), Gateway en reverse proxy (<code>/api/*</code>, <code>/hubs/*</code>), logs &amp; corrélation, health checks, Swagger.</li>
+<li><strong>CI :</strong> pipeline “build + tests” (au minimum), prêt à étendre (analyse statique, packaging).</li>
+<li><strong>Definition of Done :</strong> build vert, tests unitaires OK, API accessible sur <code>https://localhost:5101/swagger</code>, Gateway proxifie <code>/api</code> vers l’API, doc IIS complète (sites, bindings, variables, HTTPS dev).</li>
+<li><strong>Remises attendues :</strong> <code>docs/00_socle_solution.md</code>, <code>docs/deploiement/iis.md</code>, fichiers de pipeline (selon l’outil), et configuration Gateway committée.</li>
+</ul>
+</div>
+</section>
+<section class="tabcontent" id="c_demandes" role="tabpanel">
+<table aria-label="Demandes inter-équipes" class="table">
+<thead>
+<tr>
+<th style="width:140px;">ID</th>
+<th style="width:130px;">De</th>
+<th style="width:130px;">À</th>
+<th>Nécessaire pour</th>
+<th>Détails / Remise</th>
+<th style="width:130px;">Statut</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>SOC-REQ-001</code></td>
+<td>Solution</td>
+<td>Tous</td>
+<td>Démarrage solution</td>
+<td>Conventions + structure de projets + ports + variables d’environnement. <strong>Remise :</strong> <code>docs/00_socle_solution.md</code> + solution <code>Breizh360.sln</code> (références validées).</td>
+<td><span class="badge req">Demande</span></td>
+</tr><tr>
+<td><code>SOC-REQ-002</code></td>
+<td>Solution</td>
+<td>Passerelle</td>
+<td>Proxy centralisé</td>
+<td>Reverse proxy Gateway (<code>/api/*</code>, <code>/hubs/*</code>), WebSockets, CORS, corrélation. <strong>Remise :</strong> config committée dans <code>Breizh360.Gateway</code> + doc <code>docs/gateway/reverse_proxy.md</code>.</td>
+<td><span class="badge req">Demande</span></td>
+</tr><tr>
+<td><code>SOC-REQ-003</code></td>
+<td>Solution</td>
+<td>API</td>
+<td>Observabilité &amp; diagnostics</td>
+<td>Swagger (dev), health checks, logs structurés, gestion d’erreurs homogène. <strong>Remise :</strong> <code>Breizh360.Api.Metier/Program.cs</code> + <code>docs/api/diagnostics.md</code>.</td>
+<td><span class="badge req">Demande</span></td>
+</tr><tr>
+<td><code>SOC-REQ-004</code></td>
+<td>Solution</td>
+<td>Tests</td>
+<td>CI (build + tests)</td>
+<td>Pipeline CI qui compile la solution et exécute les tests. <strong>Remise :</strong> fichier de pipeline (ex : <code>.github/workflows/ci.yml</code> ou <code>azure-pipelines.yml</code>) + note dans <code>docs/ci.md</code>.</td>
+<td><span class="badge req">Demande</span></td>
+</tr>
+<tr>
+<td><code>AUTH-REQ-001</code></td>
+<td>API</td>
+<td>Domaine</td>
+<td>Endpoints d’authentification</td>
+<td>Modèle <code>User</code> + stratégie de hash + relation rôles. <strong>Remise</strong> : <code>docs/auth/01_modele_domaine.md</code> + code dans <code>Breizh360.Domaine/Auth/*</code></td>
+<td><span class="badge done">Terminé</span></td>
+</tr>
+<tr>
+<td><code>AUTH-REQ-002</code></td>
+<td>Passerelle</td>
+<td>API</td>
+<td>Validation JWT</td>
+<td>Issuer/audience, signature, durées, refresh, contrat d’erreurs. <strong>Remise</strong> : <code>docs/auth/02_contrat_jwt.md</code></td>
+<td><span class="badge req">Demande</span></td>
+</tr>
+<tr>
+<td><code>AUTH-REQ-003</code></td>
+<td>UI</td>
+<td>API</td>
+<td>Écran de login</td>
+<td>Endpoints + exemples + swagger + mapping 401/403. <strong>Remise</strong> : Swagger <code>https://localhost:5101/swagger</code> + <code>docs/auth/03_exemples_api.md</code></td>
+<td><span class="badge req">Demande</span></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section class="tabcontent" id="c_domaine" role="tabpanel">
+<div class="tasklist">
+<div class="task" id="AUTH-DOM-001">
+<div><input checked="" id="cb_AUTH-DOM-001" type="checkbox"/></div>
+<div class="meta">
+<p class="name">AUTH-DOM-001 — Entité <strong>User</strong></p>
+<p class="desc">Champs, validations, hash (mot de passe). <strong>Remise</strong> : <code>Breizh360.Domaine/Auth/Users/User.cs</code> + <code>docs/auth/01_modele_domaine.md</code></p>
+</div>
+<div class="right">
+<span class="badge done">Terminé</span>
+<span class="small"><code>Breizh360.Domaine/Auth/Users/User.cs</code><code>docs/auth/01_modele_domaine.md</code></span>
+</div>
+</div>
+<div class="task" id="AUTH-DOM-002">
+<div><input checked="" id="cb_AUTH-DOM-002" type="checkbox"/></div>
+<div class="meta">
+<p class="name">AUTH-DOM-002 — <strong>Role</strong> / <strong>Permission</strong></p>
+<p class="desc">Mapping + conventions RBAC/ABAC. <strong>Remise</strong> : <code>Breizh360.Domaine/Auth/Roles/Role.cs</code>, <code>Breizh360.Domaine/Auth/Permissions/Permission.cs</code>, <code>docs/auth/01_modele_domaine.md</code></p>
+</div>
+<div class="right">
+<span class="badge done">Terminé</span>
+<span class="small"><code>Breizh360.Domaine/Auth/Roles/Role.cs</code><code>Breizh360.Domaine/Auth/Permissions/Permission.cs</code><code>docs/auth/01_modele_domaine.md</code></span>
+</div>
+</div>
+<div class="task" id="AUTH-DOM-003">
+<div><input checked="" id="cb_AUTH-DOM-003" type="checkbox"/></div>
+<div class="meta">
+<p class="name">AUTH-DOM-003 — Contrats de dépôts</p>
+<p class="desc">Interfaces minimalistes (repositories). <strong>Remise</strong> : <code>Breizh360.Domaine/Auth/*/*Repository.cs</code></p>
+</div>
+<div class="right">
+<span class="badge done">Terminé</span>
+<span class="small"><code>Breizh360.Domaine/Auth/*/*Repository.cs</code></span>
+</div>
+</div>
+</div>
+</section>
+<section class="tabcontent" id="c_donnees" role="tabpanel">
+<div class="tasklist">
+<div class="task" id="AUTH-DATA-001">
+<div><input checked="" id="cb_AUTH-DATA-001" type="checkbox"/></div>
+<div class="meta">
+<p class="name">AUTH-DATA-001 — Schéma + migrations</p>
+<p class="desc">Users/Roles/Permissions + RefreshTokens + audit/soft delete. <strong>Remise</strong> : migrations EF Core dans <code>Breizh360.Data/Migrations</code></p>
+</div>
+<div class="right">
+<span class="badge done">Terminé</span>
+<span class="small"><code>Breizh360.Data/Breizh360DbContext.cs</code>, <code>Breizh360.Data/Auth/Configurations/*EfConfiguration.cs</code>, <code>Breizh360.Data/Migrations/Auth/*</code></span>
+</div>
+</div>
+<div class="task" id="AUTH-DATA-002">
+<div><input checked="" id="cb_AUTH-DATA-002" type="checkbox"/></div>
+<div class="meta">
+<p class="name">AUTH-DATA-002 — Dépôts (implémentations)</p>
+<p class="desc">Implémentations de dépôts alignées Domaine. <strong>Remise</strong> : <code>Breizh360.Data/Auth/*Repository.cs</code></p>
+</div>
+<div class="right">
+<span class="badge done">Terminé</span>
+<span class="small"><code>Breizh360.Data/Auth/Repositories/*Repository.cs</code></span>
+</div>
+</div>
+<div class="task" id="AUTH-DATA-003">
+<div><input checked="" id="cb_AUTH-DATA-003" type="checkbox"/></div>
+<div class="meta">
+<p class="name">AUTH-DATA-003 — Seed dev</p>
+<p class="desc">Seed dev : admin + rôles + permissions. <strong>Remise</strong> : <code>Breizh360.Data/Auth/Seed/AuthSeedDev.cs</code></p>
+</div>
+<div class="right">
+<span class="badge done">Terminé</span>
+<span class="small"><code>Breizh360.Data/Auth/Seed/AuthSeedDev.cs</code></span>
+</div>
+</div>
+</div>
+</section>
+<section class="tabcontent" id="c_metier" role="tabpanel">
+<div class="tasklist">
+<div class="task" id="AUTH-BIZ-001">
+<div><input id="cb_AUTH-BIZ-001" type="checkbox"/></div>
+<div class="meta">
+<p class="name">AUTH-BIZ-001 — Validation identifiants</p>
+<p class="desc">Vérif hash + règles (lockout optionnel). <strong>Remise</strong> : <code>Breizh360.Metier/Auth/AuthServiceValidateCredentials.cs</code></p>
+</div>
+<div class="right">
+<span class="badge todo">À faire</span>
+<span class="small"><code>Breizh360.Metier/Auth/AuthServiceValidateCredentials.cs</code></span>
+</div>
+</div>
+<div class="task" id="AUTH-BIZ-002">
+<div><input id="cb_AUTH-BIZ-002" type="checkbox"/></div>
+<div class="meta">
+<p class="name">AUTH-BIZ-002 — Contrat tokens</p>
+<p class="desc">Claims + durées + refresh (rotation, refresh hashé). <strong>Remise</strong> : <code>Breizh360.Metier/Auth/TokenService.cs</code> + <code>docs/auth/02_contrat_jwt.md</code></p>
+</div>
+<div class="right">
+<span class="badge todo">À faire</span>
+<span class="small">Aligner : API + Passerelle — , </span>
+</div>
+</div>
+<div class="task" id="AUTH-BIZ-003">
+<div><input id="cb_AUTH-BIZ-003" type="checkbox"/></div>
+<div class="meta">
+<p class="name">AUTH-BIZ-003 — Évaluation permissions</p>
+<p class="desc">Service “IsAllowed” (RBAC + ABAC). <strong>Remise</strong> : <code>Breizh360.Metier/Auth/AuthorizationServiceIsAllowed.cs</code></p>
+</div>
+<div class="right">
+<span class="badge todo">À faire</span>
+<span class="small"><code>Breizh360.Metier/Auth/AuthorizationServiceIsAllowed.cs</code></span>
+</div>
+</div>
+</div>
+</section>
+<section class="tabcontent" id="c_api" role="tabpanel">
+<div class="tasklist"><div class="task" id="SOC-API-001"><div><input id="cb_SOC-API-001" type="checkbox"/></div><div class="meta"><p class="name">SOC-API-001 — Diagnostics <strong>(Swagger + health checks + logs)</strong></p><p class="desc">Configurer Swagger (dev), endpoint <code>/health</code>, logs structurés, gestion d’erreurs homogène. <strong>Remise :</strong> <code>Breizh360.Api.Metier/Program.cs</code> + <code>docs/api/diagnostics.md</code></p></div><div class="right"><span class="badge todo">À faire</span><span class="small">____</span></div></div>
+<div class="task" id="AUTH-API-001">
+<div><input id="cb_AUTH-API-001" type="checkbox"/></div>
+<div class="meta">
+<p class="name">AUTH-API-001 — <strong>/auth/login</strong> &amp; <strong>/auth/refresh</strong></p>
+<p class="desc">DTO + codes + swagger. <strong>Remise</strong> : <code>Breizh360.Api.Metier/Controllers/AuthController.cs</code> + <code>Breizh360.Api.Metier/Contracts/Auth*</code></p>
+</div>
+<div class="right">
+<span class="badge req">Demande</span>
+<span class="small">Dépend : AUTH-BIZ-001/002</span>
+</div>
+</div>
+<div class="task" id="AUTH-API-002">
+<div><input id="cb_AUTH-API-002" type="checkbox"/></div>
+<div class="meta">
+<p class="name">AUTH-API-002 — <strong>/me</strong></p>
+<p class="desc">Profil + permissions. <strong>Remise</strong> : <code>Breizh360.Api.Metier/Controllers/MeController.cs</code></p>
+</div>
+<div class="right">
+<span class="badge todo">À faire</span>
+<span class="small">____</span>
+</div>
+</div>
+<div class="task" id="AUTH-API-003">
+<div><input id="cb_AUTH-API-003" type="checkbox"/></div>
+<div class="meta">
+<p class="name">AUTH-API-003 — Contrat d’erreurs</p>
+<p class="desc">Format d’erreurs 400/401/403 + token expiré. <strong>Remise</strong> : <code>Breizh360.Api.Metier/Errors/ApiError.cs</code> (+ middleware/filters)</p>
+</div>
+<div class="right">
+<span class="badge todo">À faire</span>
+<span class="small">____</span>
+</div>
+</div>
+</div>
+</section>
+<section class="tabcontent" id="c_gateway" role="tabpanel">
+<div class="tasklist"><div class="task" id="SOC-GW-001"><div><input id="cb_SOC-GW-001" type="checkbox"/></div><div class="meta"><p class="name">SOC-GW-001 — Reverse proxy <strong>(/api + /hubs)</strong></p><p class="desc">Configurer la Gateway en reverse proxy (YARP ou équivalent) vers l’API : <code>/api/*</code>, <code>/hubs/*</code> (WebSockets), CORS, corrélation. <strong>Remise :</strong> config dans <code>Breizh360.Gateway</code> + <code>docs/gateway/reverse_proxy.md</code></p></div><div class="right"><span class="badge todo">À faire</span><span class="small">____</span></div></div>
+<div class="task" id="AUTH-GW-001">
+<div><input id="cb_AUTH-GW-001" type="checkbox"/></div>
+<div class="meta">
+<p class="name">AUTH-GW-001 — Validation JWT</p>
+<p class="desc">Passerelle : vérif présence/format JWT + propagation <code>X-Correlation-ID</code>. <strong>Remise</strong> : <code>Breizh360.Gateway/Auth/JwtForwardingMiddleware.cs</code> + <code>docs/auth/04_gateway.md</code></p>
+</div>
+<div class="right">
+<span class="badge req">Demande</span>
+<span class="small">Dépend : AUTH-BIZ-002</span>
+</div>
+</div>
+<div class="task" id="AUTH-GW-002">
+<div><input id="cb_AUTH-GW-002" type="checkbox"/></div>
+<div class="meta">
+<p class="name">AUTH-GW-002 — Politiques de routes</p>
+<p class="desc">Routes protégées (par chemin) + proxy <code>/hubs/*</code>. <strong>Remise</strong> : config reverse proxy <code>Breizh360.Gateway/ReverseProxy</code></p>
+</div>
+<div class="right">
+<span class="badge req">Demande</span>
+<span class="small">Dépend : AUTH-API-003</span>
+</div>
+</div>
+<div class="task" id="AUTH-GW-003">
+<div><input id="cb_AUTH-GW-003" type="checkbox"/></div>
+<div class="meta">
+<p class="name">AUTH-GW-003 — Normalisation erreurs</p>
+<p class="desc">Format unique 401/403 (aligné API). <strong>Remise</strong> : <code>Breizh360.Gateway/Errors/GatewayError.cs</code> + middleware</p>
+</div>
+<div class="right">
+<span class="badge todo">À faire</span>
+<span class="small">____</span>
+</div>
+</div>
+</div>
+</section>
+<section class="tabcontent" id="c_ui" role="tabpanel">
+<div class="tasklist">
+<div class="task" id="AUTH-UI-001">
+<div><input id="cb_AUTH-UI-001" type="checkbox"/></div>
+<div class="meta">
+<p class="name">AUTH-UI-001 — Login + tokens</p>
+<p class="desc">Login + stockage tokens + refresh + erreurs. <strong>Remise</strong> : <code>Breizh360.UI/Auth/AuthClient.cs</code> + <code>Breizh360.UI/Pages/Login.razor</code></p>
+</div>
+<div class="right">
+<span class="badge req">Demande</span>
+<span class="small">Dépend : AUTH-API-001</span>
+</div>
+</div>
+<div class="task" id="AUTH-UI-002">
+<div><input id="cb_AUTH-UI-002" type="checkbox"/></div>
+<div class="meta">
+<p class="name">AUTH-UI-002 — Routes protégées + 401</p>
+<p class="desc">Routes protégées + 401/403 côté UI (redir + message). <strong>Remise</strong> : <code>Breizh360.UI/Auth/RequireAuth.razor</code></p>
+</div>
+<div class="right">
+<span class="badge todo">À faire</span>
+<span class="small">____</span>
+</div>
+</div>
+<div class="task" id="AUTH-UI-003">
+<div><input id="cb_AUTH-UI-003" type="checkbox"/></div>
+<div class="meta">
+<p class="name">AUTH-UI-003 — UI selon permissions (optionnel)</p>
+<p class="desc">UI selon permissions (optionnel). <strong>Remise</strong> : <code>Breizh360.UI/Auth/PermissionView.razor</code></p>
+</div>
+<div class="right">
+<span class="badge req">Demande</span>
+<span class="small">Dépend : AUTH-API-002</span>
+</div>
+</div>
+</div>
+</section>
+<!-- TESTS (authentification) -->
+<section class="tabcontent" id="c_tests" role="tabpanel">
+<div class="note" style="margin-bottom:12px;">
+<strong>Tests Auth (JWT) :</strong> compléter la “Remise” (chemin/PR/rapport) quand une tâche passe à “Terminé”.
+        </div>
+<div class="tasklist"><div class="task" id="SOC-CI-001"><div><input id="cb_SOC-CI-001" type="checkbox"/></div><div class="meta"><p class="name">SOC-CI-001 — CI <strong>(build + tests)</strong></p><p class="desc">Mettre en place un pipeline CI qui compile la solution et exécute les tests. <strong>Remise :</strong> fichier de pipeline (ex : <code>.github/workflows/ci.yml</code> ou <code>azure-pipelines.yml</code>) + <code>docs/ci.md</code></p></div><div class="right"><span class="badge todo">À faire</span><span class="small">____</span></div></div>
+<div class="task" id="TEST-AUTH-001">
+<div><input id="cb_TEST-AUTH-001" type="checkbox"/></div>
+<div class="meta">
+<p class="name">TEST-AUTH-001 — Plan de tests Auth (JWT)</p>
+<p class="desc">Scénarios + critères : login, refresh, /me, 400/401/403, token expiré/invalide, claims, rôles/permissions.</p>
+</div>
+<div class="right">
+<span class="badge wip">En cours</span>
+<span class="small">Remise : <code>docs/tests/plan_auth_jwt.md</code></span>
+</div>
+</div>
+<div class="task" id="TEST-AUTH-002">
+<div><input id="cb_TEST-AUTH-002" type="checkbox"/></div>
+<div class="meta">
+<p class="name">TEST-AUTH-002 — Données &amp; fixtures de test</p>
+<p class="desc">Users/roles/permissions, clés JWT de test, horloge contrôlée (si possible), nettoyage DB.</p>
+</div>
+<div class="right">
+<span class="badge req">Demande</span>
+<span class="small">Dépend : AUTH-DATA-003, AUTH-BIZ-002</span>
+</div>
+</div>
+<div class="task" id="TEST-AUTH-003">
+<div><input id="cb_TEST-AUTH-003" type="checkbox"/></div>
+<div class="meta">
+<p class="name">TEST-AUTH-003 — Tests unitaires (Métier)</p>
+<p class="desc">Validation identifiants, émission tokens (claims/durées), permissions (IsAllowed), erreurs attendues.</p>
+</div>
+<div class="right">
+<span class="badge req">Demande</span>
+<span class="small">Dépend : AUTH-BIZ-001/002/003</span>
+</div>
+</div>
+<div class="task" id="TEST-AUTH-004">
+<div><input id="cb_TEST-AUTH-004" type="checkbox"/></div>
+<div class="meta">
+<p class="name">TEST-AUTH-004 — Tests d’intégration API (Auth)</p>
+<p class="desc">/auth/login, /auth/refresh, /me : schémas, codes, erreurs, expiration, refresh KO, permissions.</p>
+</div>
+<div class="right">
+<span class="badge req">Demande</span>
+<span class="small">Dépend : AUTH-API-001/002/003</span>
+</div>
+</div>
+<div class="task" id="TEST-AUTH-005">
+<div><input id="cb_TEST-AUTH-005" type="checkbox"/></div>
+<div class="meta">
+<p class="name">TEST-AUTH-005 — Tests Passerelle (JWT + politiques)</p>
+<p class="desc">Routes protégées, JWT invalide/expiré, claims manquants, mapping 401/403, format d’erreurs.</p>
+</div>
+<div class="right">
+<span class="badge req">Demande</span>
+<span class="small">Dépend : AUTH-GW-001/002/003</span>
+</div>
+</div>
+<div class="task" id="TEST-AUTH-006">
+<div><input id="cb_TEST-AUTH-006" type="checkbox"/></div>
+<div class="meta">
+<p class="name">TEST-AUTH-006 — Scénarios E2E (optionnel)</p>
+<p class="desc">Login, navigation protégée, expiration + redirection, refresh silencieux, logout, 401/403 côté UI.</p>
+</div>
+<div class="right">
+<span class="badge req">Demande</span>
+<span class="small">Dépend : AUTH-UI-001/002</span>
+</div>
+</div>
+<div class="task" id="TEST-AUTH-007">
+<div><input id="cb_TEST-AUTH-007" type="checkbox"/></div>
+<div class="meta">
+<p class="name">TEST-AUTH-007 — Exécution en CI + rapport</p>
+<p class="desc">Lancer unitaires + intégration Auth, publier rapport, bloquer le merge si échec.</p>
+</div>
+<div class="right">
+<span class="badge todo">À faire</span>
+<span class="small">Remise : <code>docs/ci/ci_tests.md</code> (+ fichier pipeline)</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</body>
+</html>

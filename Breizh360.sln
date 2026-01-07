@@ -1,0 +1,75 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11205.157
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Breizh360.Api", "Breizh360.Api\Breizh360.Api.csproj", "{44444444-4444-4444-4444-444444444444}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Breizh360.Gateway", "Breizh360.Gateway\Breizh360.Gateway.csproj", "{55555555-5555-5555-5555-555555555555}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Éléments de solution", "Éléments de solution", "{33833F3B-22A5-483A-AB18-017E721557A0}"
+	ProjectSection(SolutionItems) = preProject
+		Docs\00_LIRE_SUIVI_COLLABORATION.md = Docs\00_LIRE_SUIVI_COLLABORATION.md
+		Docs\01_PROMPT_ResponsableSolution.txt = Docs\01_PROMPT_ResponsableSolution.txt
+		Docs\02_PROMPT_Domaine.txt = Docs\02_PROMPT_Domaine.txt
+		Docs\03_PROMPT_Donnees.txt = Docs\03_PROMPT_Donnees.txt
+		Docs\04_PROMPT_Metier.txt = Docs\04_PROMPT_Metier.txt
+		Docs\05_PROMPT_ApiMetier.txt = Docs\05_PROMPT_ApiMetier.txt
+		Docs\06_PROMPT_Gateway.txt = Docs\06_PROMPT_Gateway.txt
+		Docs\07_PROMPT_Tests.txt = Docs\07_PROMPT_Tests.txt
+		Docs\08_PROMPT_UI.txt = Docs\08_PROMPT_UI.txt
+		Docs\suivi_collaboration.html = Docs\suivi_collaboration.html
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Breizh360.Data", "Breizh360.Data\Breizh360.Data.csproj", "{B4B111DB-A35D-4791-808D-34B0536B358C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Breizh360.Metier", "Breizh360.Metier\Breizh360.Metier.csproj", "{336D43AB-3776-4D7B-8BDC-A73072B6D287}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Breizh360.Domaine", "Breizh360.Domaine\Breizh360.Domaine.csproj", "{D414C2B4-DE78-4CC7-8689-2C9DA16AEB7C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Breizh360.Tests", "Breizh360.Tests\Breizh360.Tests.csproj", "{9F8E5EBF-F0FB-49D4-B978-62F2AC54C243}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Breizh360.UI", "Breizh360.UI\Breizh360.UI.csproj", "{C133DF2E-C97D-4C6E-B36D-2A7C805658D2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{44444444-4444-4444-4444-444444444444}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44444444-4444-4444-4444-444444444444}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44444444-4444-4444-4444-444444444444}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44444444-4444-4444-4444-444444444444}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55555555-5555-5555-5555-555555555555}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55555555-5555-5555-5555-555555555555}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55555555-5555-5555-5555-555555555555}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55555555-5555-5555-5555-555555555555}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4B111DB-A35D-4791-808D-34B0536B358C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4B111DB-A35D-4791-808D-34B0536B358C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4B111DB-A35D-4791-808D-34B0536B358C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4B111DB-A35D-4791-808D-34B0536B358C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{336D43AB-3776-4D7B-8BDC-A73072B6D287}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{336D43AB-3776-4D7B-8BDC-A73072B6D287}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{336D43AB-3776-4D7B-8BDC-A73072B6D287}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{336D43AB-3776-4D7B-8BDC-A73072B6D287}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D414C2B4-DE78-4CC7-8689-2C9DA16AEB7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D414C2B4-DE78-4CC7-8689-2C9DA16AEB7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D414C2B4-DE78-4CC7-8689-2C9DA16AEB7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D414C2B4-DE78-4CC7-8689-2C9DA16AEB7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F8E5EBF-F0FB-49D4-B978-62F2AC54C243}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F8E5EBF-F0FB-49D4-B978-62F2AC54C243}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F8E5EBF-F0FB-49D4-B978-62F2AC54C243}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F8E5EBF-F0FB-49D4-B978-62F2AC54C243}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C133DF2E-C97D-4C6E-B36D-2A7C805658D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C133DF2E-C97D-4C6E-B36D-2A7C805658D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C133DF2E-C97D-4C6E-B36D-2A7C805658D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C133DF2E-C97D-4C6E-B36D-2A7C805658D2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B97E0931-70CD-4EB1-A278-714D655F9DF4}
+	EndGlobalSection
+EndGlobal

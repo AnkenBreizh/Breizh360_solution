@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Breizh360.Gateway": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:56699;http://localhost:56702"
+    }
+  }
+}

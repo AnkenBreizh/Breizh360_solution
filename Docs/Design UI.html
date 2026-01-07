@@ -1,0 +1,1619 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bibliothèque UI - Gris Anthracite + Rouge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #F3F4F6;
+            color: #111827;
+            line-height: 1.6;
+        }
+
+        /* Navigation fixe */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            background: linear-gradient(135deg, #374151 0%, #EF4444 100%);
+            color: white;
+            padding: 2rem 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .sidebar-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+
+        .nav-menu {
+            padding: 1rem;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: #6B7280;
+            text-decoration: none;
+            border-radius: 0.5rem;
+            margin-bottom: 0.25rem;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+            .nav-item:hover {
+                background-color: #F3F4F6;
+                color: #374151;
+            }
+
+            .nav-item.active {
+                background-color: #374151;
+                color: white;
+            }
+
+        .nav-icon {
+            font-size: 1.25rem;
+        }
+
+        /* Toggle sidebar mobile */
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1001;
+            background: #374151;
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        /* Main content */
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem;
+            transition: margin-left 0.3s ease;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #374151 0%, #EF4444 100%);
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+            .page-header h1 {
+                font-size: 2.5rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .page-header p {
+                font-size: 1.125rem;
+                opacity: 0.95;
+            }
+
+        /* Search bar */
+        .search-bar {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid #E5E7EB;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.25s ease;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: 1rem center;
+        }
+
+            .search-input:focus {
+                outline: none;
+                border-color: #374151;
+                box-shadow: 0 0 0 3px rgba(55, 65, 81, 0.1);
+            }
+
+        /* Section card */
+        .section {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid #374151;
+        }
+
+        .section-icon {
+            font-size: 2rem;
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #374151 0%, #4B5563 100%);
+            color: white;
+            border-radius: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .section-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .section-description {
+            color: #6B7280;
+            font-size: 0.95rem;
+            margin-top: 0.25rem;
+        }
+
+        .subsection {
+            margin-bottom: 2.5rem;
+        }
+
+            .subsection:last-child {
+                margin-bottom: 0;
+            }
+
+        .subsection-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .subsection-badge {
+            background-color: rgba(55, 65, 81, 0.1);
+            color: #374151;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .subsection-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        /* Demo container with copy button */
+        .demo-container {
+            background: #F9FAFB;
+            border: 2px solid #E5E7EB;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .demo-label {
+            position: absolute;
+            top: -12px;
+            left: 1rem;
+            background: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #374151;
+            border: 2px solid #E5E7EB;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: white;
+            border: 2px solid #E5E7EB;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            transition: all 0.2s ease;
+        }
+
+            .copy-btn:hover {
+                background: #374151;
+                color: white;
+                border-color: #374151;
+            }
+
+        /* Color palette improved */
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .color-item {
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+
+            .color-item:hover {
+                transform: translateY(-4px);
+            }
+
+        .color-box {
+            height: 100px;
+            border-radius: 0.75rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+            .color-box::after {
+                content: 'Copier';
+                position: absolute;
+                inset: 0;
+                background: rgba(0,0,0,0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                opacity: 0;
+                transition: opacity 0.2s ease;
+            }
+
+            .color-box:hover::after {
+                opacity: 1;
+            }
+
+        .color-label {
+            font-size: 0.875rem;
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .color-code {
+            font-size: 0.75rem;
+            color: #9CA3AF;
+            font-family: 'Courier New', monospace;
+            background: #F3F4F6;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+        }
+
+        /* Components styles */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: inherit;
+        }
+
+            .btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+            }
+
+            .btn:active {
+                transform: translateY(0);
+            }
+
+        .btn-primary {
+            background-color: #374151;
+            color: white;
+        }
+
+            .btn-primary:hover {
+                background-color: #1F2937;
+            }
+
+        .btn-secondary {
+            background-color: #EF4444;
+            color: white;
+        }
+
+            .btn-secondary:hover {
+                background-color: #DC2626;
+            }
+
+        .btn-outline {
+            background-color: transparent;
+            color: #374151;
+            border: 2px solid #374151;
+        }
+
+            .btn-outline:hover {
+                background-color: #374151;
+                color: white;
+            }
+
+        .btn-ghost {
+            background-color: transparent;
+            color: #374151;
+        }
+
+            .btn-ghost:hover {
+                background-color: #F3F4F6;
+            }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        .btn-lg {
+            padding: 1rem 2rem;
+            font-size: 1.125rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        /* Cards */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            border: 2px solid transparent;
+        }
+
+            .card:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+                border-color: #374151;
+            }
+
+        .card-border {
+            height: 4px;
+            background: linear-gradient(90deg, #374151 0%, #EF4444 100%);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-text {
+            color: #6B7280;
+            line-height: 1.6;
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-primary {
+            background-color: rgba(55, 65, 81, 0.1);
+            color: #374151;
+        }
+
+        .badge-secondary {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #EF4444;
+        }
+
+        .badge-success {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #10B981;
+        }
+
+        .badge-warning {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: #F59E0B;
+        }
+
+        /* Alert */
+        .alert {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid;
+        }
+
+        .alert-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: #10B981;
+            color: #065F46;
+        }
+
+        .alert-info {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: #3B82F6;
+            color: #1E3A8A;
+        }
+
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: #F59E0B;
+            color: #92400E;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: #EF4444;
+            color: #991B1B;
+        }
+
+        /* Progress */
+        .progress-container {
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 14px;
+            background: #E5E7EB;
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #374151 0%, #4B5563 100%);
+            border-radius: 9999px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+            .progress-fill::after {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+                animation: shimmer 2s infinite;
+            }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        /* Back to top button */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #374151;
+            color: white;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            z-index: 999;
+            border: none;
+            font-size: 1.5rem;
+        }
+
+            .back-to-top.visible {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            .back-to-top:hover {
+                background: #1F2937;
+                transform: translateY(-4px);
+            }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+                .sidebar.open {
+                    transform: translateX(0);
+                }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .section {
+                padding: 1.5rem;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .back-to-top {
+                width: 48px;
+                height: 48px;
+                bottom: 1.5rem;
+                right: 1.5rem;
+            }
+        }
+
+        /* Tooltips */
+        .tooltip {
+            position: relative;
+            cursor: help;
+        }
+
+            .tooltip::after {
+                content: attr(data-tooltip);
+                position: absolute;
+                bottom: calc(100% + 10px);
+                left: 50%;
+                transform: translateX(-50%);
+                background: #1F2937;
+                color: white;
+                padding: 0.5rem 0.75rem;
+                border-radius: 0.5rem;
+                font-size: 0.875rem;
+                white-space: nowrap;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.2s ease;
+                z-index: 1000;
+            }
+
+            .tooltip:hover::after {
+                opacity: 1;
+            }
+    </style>
+</head>
+<body>
+    <!-- Menu Toggle Mobile -->
+    <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">🎨 UI Library</div>
+            <div class="sidebar-subtitle">Gris Anthracite + Rouge</div>
+        </div>
+        <div class="nav-menu">
+            <a href="#colors" class="nav-item" onclick="scrollToSection('colors')">
+                <span class="nav-icon">🎨</span>
+                Couleurs
+            </a>
+            <a href="#buttons" class="nav-item" onclick="scrollToSection('buttons')">
+                <span class="nav-icon">🔘</span>
+                Boutons
+            </a>
+            <a href="#cards" class="nav-item" onclick="scrollToSection('cards')">
+                <span class="nav-icon">🗂️</span>
+                Cards
+            </a>
+            <a href="#forms" class="nav-item" onclick="scrollToSection('forms')">
+                <span class="nav-icon">📝</span>
+                Formulaires
+            </a>
+            <a href="#badges" class="nav-item" onclick="scrollToSection('badges')">
+                <span class="nav-icon">🏷️</span>
+                Badges
+            </a>
+            <a href="#alerts" class="nav-item" onclick="scrollToSection('alerts')">
+                <span class="nav-icon">⚠️</span>
+                Alertes
+            </a>
+            <a href="#progress" class="nav-item" onclick="scrollToSection('progress')">
+                <span class="nav-icon">📊</span>
+                Progression
+            </a>
+            <a href="#components" class="nav-item" onclick="scrollToSection('components')">
+                <span class="nav-icon">🧩</span>
+                Composants avancés
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <div class="page-header">
+            <h1>Bibliothèque UI Complète</h1>
+            <p>Design System harmonisé pour MAUI Blazor • Palette Gris Anthracite + Rouge</p>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <input type="text" class="search-input" placeholder="Rechercher un composant..." id="searchInput" onkeyup="filterComponents()">
+        </div>
+
+        <!-- Section: Colors -->
+        <section class="section" id="colors" data-keywords="couleurs colors palette primaire secondaire">
+            <div class="section-header">
+                <div class="section-icon">🎨</div>
+                <div>
+                    <h2 class="section-title">Palette de couleurs</h2>
+                    <p class="section-description">Cliquez sur une couleur pour copier son code hexadécimal</p>
+                </div>
+            </div>
+
+            <div class="color-palette">
+                <div class="color-item">
+                    <div class="color-box" style="background-color: #374151;" onclick="copyColor('#374151')" data-tooltip="Cliquer pour copier">
+                        <span>Primaire</span>
+                    </div>
+                    <div class="color-label">Primaire</div>
+                    <div class="color-code">#374151</div>
+                </div>
+
+                <div class="color-item">
+                    <div class="color-box" style="background-color: #1F2937;" onclick="copyColor('#1F2937')">
+                        <span>Primaire Dark</span>
+                    </div>
+                    <div class="color-label">Primaire Dark</div>
+                    <div class="color-code">#1F2937</div>
+                </div>
+
+                <div class="color-item">
+                    <div class="color-box" style="background-color: #EF4444;" onclick="copyColor('#EF4444')">
+                        <span>Secondaire</span>
+                    </div>
+                    <div class="color-label">Secondaire</div>
+                    <div class="color-code">#EF4444</div>
+                </div>
+
+                <div class="color-item">
+                    <div class="color-box" style="background-color: #DC2626;" onclick="copyColor('#DC2626')">
+                        <span>Secondaire Dark</span>
+                    </div>
+                    <div class="color-label">Secondaire Dark</div>
+                    <div class="color-code">#DC2626</div>
+                </div>
+
+                <div class="color-item">
+                    <div class="color-box" style="background-color: #10B981;" onclick="copyColor('#10B981')">
+                        <span>Succès</span>
+                    </div>
+                    <div class="color-label">Succès</div>
+                    <div class="color-code">#10B981</div>
+                </div>
+
+                <div class="color-item">
+                    <div class="color-box" style="background-color: #F59E0B;" onclick="copyColor('#F59E0B')">
+                        <span>Warning</span>
+                    </div>
+                    <div class="color-label">Warning</div>
+                    <div class="color-code">#F59E0B</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Buttons -->
+        <section class="section" id="buttons" data-keywords="boutons buttons actions cta">
+            <div class="section-header">
+                <div class="section-icon">🔘</div>
+                <div>
+                    <h2 class="section-title">Boutons</h2>
+                    <p class="section-description">Tous les styles de boutons disponibles</p>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <div class="subsection-header">
+                    <h3 class="subsection-title">Variantes</h3>
+                    <span class="subsection-badge">4 styles</span>
+                </div>
+                <div class="demo-container">
+                    <span class="demo-label">Aperçu</span>
+                    <div class="button-group">
+                        <button class="btn btn-primary">Primaire</button>
+                        <button class="btn btn-secondary">Secondaire</button>
+                        <button class="btn btn-outline">Outline</button>
+                        <button class="btn btn-ghost">Ghost</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <div class="subsection-header">
+                    <h3 class="subsection-title">Tailles</h3>
+                    <span class="subsection-badge">3 tailles</span>
+                </div>
+                <div class="demo-container">
+                    <span class="demo-label">Aperçu</span>
+                    <div class="button-group">
+                        <button class="btn btn-primary btn-sm">Petit</button>
+                        <button class="btn btn-primary">Moyen (défaut)</button>
+                        <button class="btn btn-primary btn-lg">Grand</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <div class="subsection-header">
+                    <h3 class="subsection-title">Avec icônes</h3>
+                </div>
+                <div class="demo-container">
+                    <span class="demo-label">Aperçu</span>
+                    <div class="button-group">
+                        <button class="btn btn-primary">
+                            <span>✓</span> Enregistrer
+                        </button>
+                        <button class="btn btn-secondary">
+                            <span>🗑️</span> Supprimer
+                        </button>
+                        <button class="btn btn-outline">
+                            <span>📥</span> Télécharger
+                        </button>
+                        <button class="btn btn-ghost">
+                            <span>⚙️</span> Paramètres
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Cards -->
+        <section class="section" id="cards" data-keywords="cards cartes conteneurs">
+            <div class="section-header">
+                <div class="section-icon">🗂️</div>
+                <div>
+                    <h2 class="section-title">Cards</h2>
+                    <p class="section-description">Conteneurs pour organiser votre contenu</p>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <div class="subsection-header">
+                    <h3 class="subsection-title">Cards basiques</h3>
+                </div>
+                <div class="cards-grid">
+                    <div class="card">
+                        <div class="card-border"></div>
+                        <div class="card-body">
+                            <h3 class="card-title">Tableau de bord</h3>
+                            <p class="card-text">Vue d'ensemble de vos statistiques et métriques principales en temps réel.</p>
+                            <div style="margin-top: 1rem;">
+                                <span class="badge badge-primary">Actif</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-border"></div>
+                        <div class="card-body">
+                            <h3 class="card-title">Rapports</h3>
+                            <p class="card-text">Générez et exportez vos rapports détaillés avec graphiques.</p>
+                            <div style="margin-top: 1rem;">
+                                <span class="badge badge-success">Disponible</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-border"></div>
+                        <div class="card-body">
+                            <h3 class="card-title">Paramètres</h3>
+                            <p class="card-text">Configurez votre application selon vos préférences.</p>
+                            <div style="margin-top: 1rem;">
+                                <span class="badge badge-warning">En cours</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Forms -->
+        <section class="section" id="forms" data-keywords="formulaires forms inputs champs">
+            <div class="section-header">
+                <div class="section-icon">📝</div>
+                <div>
+                    <h2 class="section-title">Formulaires</h2>
+                    <p class="section-description">Champs de saisie et éléments de formulaire</p>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <div class="subsection-header">
+                    <h3 class="subsection-title">Exemple de formulaire complet</h3>
+                </div>
+                <div class="demo-container">
+                    <span class="demo-label">Formulaire d'inscription</span>
+                    <form style="max-width: 600px;">
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151;">
+                                Nom complet <span style="color: #EF4444;">*</span>
+                            </label>
+                            <input type="text" placeholder="Jean Dupont" style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #E5E7EB; border-radius: 0.5rem; font-size: 1rem; font-family: inherit; transition: all 0.25s ease;" onfocus="this.style.borderColor='#374151'; this.style.boxShadow='0 0 0 3px rgba(55, 65, 81, 0.1)'" onblur="this.style.borderColor='#E5E7EB'; this.style.boxShadow='none'">
+                        </div>
+
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151;">Email</label>
+                            <input type="email" placeholder="email@exemple.com" style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #E5E7EB; border-radius: 0.5rem; font-size: 1rem; font-family: inherit;" onfocus="this.style.borderColor='#374151'; this.style.boxShadow='0 0 0 3px rgba(55, 65, 81, 0.1)'" onblur="this.style.borderColor='#E5E7EB'; this.style.boxShadow='none'">
+                        </div>
+
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151;">Message</label>
+                            <textarea placeholder="Votre message..." style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #E5E7EB; border-radius: 0.5rem; font-size: 1rem; font-family: inherit; min-height: 120px; resize: vertical;" onfocus="this.style.borderColor='#374151'; this.style.boxShadow='0 0 0 3px rgba(55, 65, 81, 0.1)'" onblur="this.style.borderColor='#E5E7EB'; this.style.boxShadow='none'"></textarea>
+                        </div>
+
+                        <div class="button-group">
+                            <button class="btn btn-primary" type="button">Envoyer</button>
+                            <button class="btn btn-outline" type="button">Annuler</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Badges -->
+        <section class="section" id="badges" data-keywords="badges étiquettes labels tags">
+            <div class="section-header">
+                <div class="section-icon">🏷️</div>
+                <div>
+                    <h2 class="section-title">Badges</h2>
+                    <p class="section-description">Étiquettes pour statuts et catégories</p>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <div class="subsection-header">
+                    <h3 class="subsection-title">Toutes les variantes</h3>
+                </div>
+                <div class="demo-container">
+                    <span class="demo-label">Aperçu</span>
+                    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                        <span class="badge badge-primary">Primaire</span>
+                        <span class="badge badge-secondary">Secondaire</span>
+                        <span class="badge badge-success">Succès</span>
+                        <span class="badge badge-warning">Attention</span>
+                        <span class="badge badge-primary">En cours</span>
+                        <span class="badge badge-success">Validé</span>
+                        <span class="badge badge-secondary">Urgent</span>
+                        <span class="badge badge-warning">En attente</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Alerts -->
+        <section class="section" id="alerts" data-keywords="alertes notifications messages info">
+            <div class="section-header">
+                <div class="section-icon">⚠️</div>
+                <div>
+                    <h2 class="section-title">Alertes & Notifications</h2>
+                    <p class="section-description">Messages d'information pour l'utilisateur</p>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <div class="alert alert-success">
+                    <span class="alert-icon">✓</span>
+                    <div>
+                        <strong>Succès !</strong> Votre profil a été mis à jour avec succès.
+                    </div>
+                </div>
+
+                <div class="alert alert-info">
+                    <span class="alert-icon">ℹ</span>
+                    <div>
+                        <strong>Information</strong> Une nouvelle version est disponible.
+                    </div>
+                </div>
+
+                <div class="alert alert-warning">
+                    <span class="alert-icon">⚠</span>
+                    <div>
+                        <strong>Attention</strong> Votre abonnement expire dans 3 jours.
+                    </div>
+                </div>
+
+                <div class="alert alert-error">
+                    <span class="alert-icon">✕</span>
+                    <div>
+                        <strong>Erreur</strong> Impossible de se connecter au serveur.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Progress -->
+        <section class="section" id="progress" data-keywords="progression progress barre chargement loading">
+            <div class="section-header">
+                <div class="section-icon">📊</div>
+                <div>
+                    <h2 class="section-title">Barres de progression</h2>
+                    <p class="section-description">Indicateurs visuels de progression</p>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <div class="demo-container">
+                    <span class="demo-label">Exemples</span>
+
+                    <div class="progress-container">
+                        <div class="progress-label">
+                            <span>Téléchargement</span>
+                            <span>75%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 75%"></div>
+                        </div>
+                    </div>
+
+                    <div class="progress-container">
+                        <div class="progress-label">
+                            <span>Utilisation du stockage</span>
+                            <span>45%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 45%; background: linear-gradient(90deg, #EF4444 0%, #F87171 100%);"></div>
+                        </div>
+                    </div>
+
+                    <div class="progress-container">
+                        <div class="progress-label">
+                            <span>Progression du projet</span>
+                            <span>90%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 90%; background: linear-gradient(90deg, #10B981 0%, #34D399 100%);"></div>
+                        </div>
+                    </div>
+
+                    <div class="progress-container" style="margin-bottom: 0;">
+                        <div class="progress-label">
+                            <span>Installation</span>
+                            <span>100%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 100%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Charts -->
+        <section class="section" id="charts" data-keywords="graphiques charts camembert barres histogramme pie chart">
+            <div class="section-header">
+                <div class="section-icon">📈</div>
+                <div>
+                    <h2 class="section-title">Graphiques</h2>
+                    <p class="section-description">Visualisations de données élégantes</p>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <div class="subsection-header">
+                    <h3 class="subsection-title">Graphiques en barres</h3>
+                    <span class="subsection-badge">Bar Charts</span>
+                </div>
+                <div class="demo-container">
+                    <span class="demo-label">Ventes par mois</span>
+                    <div style="background: white; padding: 2rem; border-radius: 0.75rem;">
+                        <div style="display: flex; align-items: flex-end; gap: 1.5rem; height: 300px; padding: 1rem;">
+                            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                                <div style="width: 100%; background: linear-gradient(180deg, #374151 0%, #4B5563 100%); border-radius: 0.5rem 0.5rem 0 0; position: relative; animation: growUp 1s ease; height: 65%;" title="Janvier: 65%">
+                                    <div style="position: absolute; top: -30px; left: 50%; transform: translateX(-50%); font-weight: 700; color: #374151; font-size: 0.875rem;">65%</div>
+                                </div>
+                                <span style="font-size: 0.875rem; color: #6B7280; font-weight: 600;">Jan</span>
+                            </div>
+                            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                                <div style="width: 100%; background: linear-gradient(180deg, #374151 0%, #4B5563 100%); border-radius: 0.5rem 0.5rem 0 0; position: relative; animation: growUp 1.2s ease; height: 80%;">
+                                    <div style="position: absolute; top: -30px; left: 50%; transform: translateX(-50%); font-weight: 700; color: #374151; font-size: 0.875rem;">80%</div>
+                                </div>
+                                <span style="font-size: 0.875rem; color: #6B7280; font-weight: 600;">Fév</span>
+                            </div>
+                            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                                <div style="width: 100%; background: linear-gradient(180deg, #EF4444 0%, #F87171 100%); border-radius: 0.5rem 0.5rem 0 0; position: relative; animation: growUp 1.4s ease; height: 95%;">
+                                    <div style="position: absolute; top: -30px; left: 50%; transform: translateX(-50%); font-weight: 700; color: #EF4444; font-size: 0.875rem;">95%</div>
+                                </div>
+                                <span style="font-size: 0.875rem; color: #6B7280; font-weight: 600;">Mar</span>
+                            </div>
+                            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                                <div style="width: 100%; background: linear-gradient(180deg, #374151 0%, #4B5563 100%); border-radius: 0.5rem 0.5rem 0 0; position: relative; animation: growUp 1.6s ease; height: 70%;">
+                                    <div style="position: absolute; top: -30px; left: 50%; transform: translateX(-50%); font-weight: 700; color: #374151; font-size: 0.875rem;">70%</div>
+                                </div>
+                                <span style="font-size: 0.875rem; color: #6B7280; font-weight: 600;">Avr</span>
+                            </div>
+                            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                                <div style="width: 100%; background: linear-gradient(180deg, #374151 0%, #4B5563 100%); border-radius: 0.5rem 0.5rem 0 0; position: relative; animation: growUp 1.8s ease; height: 85%;">
+                                    <div style="position: absolute; top: -30px; left: 50%; transform: translateX(-50%); font-weight: 700; color: #374151; font-size: 0.875rem;">85%</div>
+                                </div>
+                                <span style="font-size: 0.875rem; color: #6B7280; font-weight: 600;">Mai</span>
+                            </div>
+                            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                                <div style="width: 100%; background: linear-gradient(180deg, #10B981 0%, #34D399 100%); border-radius: 0.5rem 0.5rem 0 0; position: relative; animation: growUp 2s ease; height: 100%;">
+                                    <div style="position: absolute; top: -30px; left: 50%; transform: translateX(-50%); font-weight: 700; color: #10B981; font-size: 0.875rem;">100%</div>
+                                </div>
+                                <span style="font-size: 0.875rem; color: #6B7280; font-weight: 600;">Jun</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <div class="subsection-header">
+                    <h3 class="subsection-title">Graphique en camembert</h3>
+                    <span class="subsection-badge">Pie Chart</span>
+                </div>
+                <div class="demo-container">
+                    <span class="demo-label">Répartition des ventes</span>
+                    <div style="background: white; padding: 2rem; border-radius: 0.75rem; display: flex; flex-wrap: wrap; gap: 3rem; align-items: center; justify-content: center;">
+                        <div style="position: relative; width: 250px; height: 250px;">
+                            <div style="width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(
+                                #374151 0deg 126deg,
+                                #EF4444 126deg 234deg,
+                                #10B981 234deg 306deg,
+                                #F59E0B 306deg 360deg
+                            ); animation: rotate360 2s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.15);"></div>
+                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 140px; height: 140px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-direction: column; box-shadow: 0 0 20px rgba(0,0,0,0.1);">
+                                <div style="font-size: 2rem; font-weight: 700; color: #111827;">100%</div>
+                                <div style="font-size: 0.875rem; color: #6B7280;">Total</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <div style="width: 24px; height: 24px; background: #374151; border-radius: 0.25rem;"></div>
+                                <div>
+                                    <div style="font-weight: 600; color: #111827;">Produit A</div>
+                                    <div style="font-size: 0.875rem; color: #6B7280;">35% (3,500€)</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <div style="width: 24px; height: 24px; background: #EF4444; border-radius: 0.25rem;"></div>
+                                <div>
+                                    <div style="font-weight: 600; color: #111827;">Produit B</div>
+                                    <div style="font-size: 0.875rem; color: #6B7280;">30% (3,000€)</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <div style="width: 24px; height: 24px; background: #10B981; border-radius: 0.25rem;"></div>
+                                <div>
+                                    <div style="font-weight: 600; color: #111827;">Produit C</div>
+                                    <div style="font-size: 0.875rem; color: #6B7280;">20% (2,000€)</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <div style="width: 24px; height: 24px; background: #F59E0B; border-radius: 0.25rem;"></div>
+                                <div>
+                                    <div style="font-weight: 600; color: #111827;">Produit D</div>
+                                    <div style="font-size: 0.875rem; color: #6B7280;">15% (1,500€)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <div class="subsection-header">
+                    <h3 class="subsection-title">Graphique linéaire</h3>
+                    <span class="subsection-badge">Line Chart</span>
+                </div>
+                <div class="demo-container">
+                    <span class="demo-label">Évolution du trafic</span>
+                    <div style="background: white; padding: 2rem; border-radius: 0.75rem;">
+                        <div style="position: relative; height: 300px; padding: 1rem; display: flex; align-items: flex-end;">
+                            <!-- Grid lines -->
+                            <div style="position: absolute; inset: 1rem; display: flex; flex-direction: column; justify-content: space-between;">
+                                <div style="width: 100%; height: 1px; background: #E5E7EB;"></div>
+                                <div style="width: 100%; height: 1px; background: #E5E7EB;"></div>
+                                <div style="width: 100%; height: 1px; background: #E5E7EB;"></div>
+                                <div style="width: 100%; height: 1px; background: #E5E7EB;"></div>
+                                <div style="width: 100%; height: 1px; background: #E5E7EB;"></div>
+                            </div>
+
+                            <!-- Line chart -->
+                            <svg style="width: 100%; height: 100%; position: relative; z-index: 1;" viewBox="0 0 600 200" preserveAspectRatio="none">
+                                <defs>
+                                    <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" style="stop-color:#374151;stop-opacity:0.3" />
+                                        <stop offset="100%" style="stop-color:#374151;stop-opacity:0" />
+                                    </linearGradient>
+                                </defs>
+                                <!-- Area under line -->
+                                <path d="M 0 160 L 100 120 L 200 140 L 300 80 L 400 100 L 500 40 L 600 60 L 600 200 L 0 200 Z"
+                                      fill="url(#lineGradient)"
+                                      style="animation: drawArea 2s ease forwards; opacity: 0;">
+                                </path>
+                                <!-- Line -->
+                                <path d="M 0 160 L 100 120 L 200 140 L 300 80 L 400 100 L 500 40 L 600 60"
+                                      fill="none"
+                                      stroke="#374151"
+                                      stroke-width="3"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      style="stroke-dasharray: 1000; stroke-dashoffset: 1000; animation: drawLine 2s ease forwards;" />
+                                <!-- Points -->
+                                <circle cx="0" cy="160" r="5" fill="#374151" style="animation: fadeIn 2s ease 0.2s forwards; opacity: 0;" />
+                                <circle cx="100" cy="120" r="5" fill="#374151" style="animation: fadeIn 2s ease 0.4s forwards; opacity: 0;" />
+                                <circle cx="200" cy="140" r="5" fill="#374151" style="animation: fadeIn 2s ease 0.6s forwards; opacity: 0;" />
+                                <circle cx="300" cy="80" r="5" fill="#EF4444" style="animation: fadeIn 2s ease 0.8s forwards; opacity: 0;" />
+                                <circle cx="400" cy="100" r="5" fill="#374151" style="animation: fadeIn 2s ease 1s forwards; opacity: 0;" />
+                                <circle cx="500" cy="40" r="5" fill="#10B981" style="animation: fadeIn 2s ease 1.2s forwards; opacity: 0;" />
+                                <circle cx="600" cy="60" r="5" fill="#374151" style="animation: fadeIn 2s ease 1.4s forwards; opacity: 0;" />
+                            </svg>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0 1rem; margin-top: 1rem;">
+                            <span style="font-size: 0.875rem; color: #6B7280; font-weight: 600;">Lun</span>
+                            <span style="font-size: 0.875rem; color: #6B7280; font-weight: 600;">Mar</span>
+                            <span style="font-size: 0.875rem; color: #6B7280; font-weight: 600;">Mer</span>
+                            <span style="font-size: 0.875rem; color: #6B7280; font-weight: 600;">Jeu</span>
+                            <span style="font-size: 0.875rem; color: #6B7280; font-weight: 600;">Ven</span>
+                            <span style="font-size: 0.875rem; color: #6B7280; font-weight: 600;">Sam</span>
+                            <span style="font-size: 0.875rem; color: #6B7280; font-weight: 600;">Dim</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <div class="subsection-header">
+                    <h3 class="subsection-title">Barres horizontales</h3>
+                    <span class="subsection-badge">Horizontal Bars</span>
+                </div>
+                <div class="demo-container" style="margin-bottom: 0;">
+                    <span class="demo-label">Performance par équipe</span>
+                    <div style="background: white; padding: 2rem; border-radius: 0.75rem; display: flex; flex-direction: column; gap: 1.5rem;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="font-weight: 600; color: #111827;">Équipe Design</span>
+                                <span style="font-weight: 700; color: #374151;">92%</span>
+                            </div>
+                            <div style="width: 100%; height: 12px; background: #E5E7EB; border-radius: 9999px; overflow: hidden;">
+                                <div style="height: 100%; width: 92%; background: linear-gradient(90deg, #374151 0%, #4B5563 100%); border-radius: 9999px; animation: slideRight 1.5s ease;"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="font-weight: 600; color: #111827;">Équipe Développement</span>
+                                <span style="font-weight: 700; color: #EF4444;">88%</span>
+                            </div>
+                            <div style="width: 100%; height: 12px; background: #E5E7EB; border-radius: 9999px; overflow: hidden;">
+                                <div style="height: 100%; width: 88%; background: linear-gradient(90deg, #EF4444 0%, #F87171 100%); border-radius: 9999px; animation: slideRight 1.7s ease;"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="font-weight: 600; color: #111827;">Équipe Marketing</span>
+                                <span style="font-weight: 700; color: #10B981;">95%</span>
+                            </div>
+                            <div style="width: 100%; height: 12px; background: #E5E7EB; border-radius: 9999px; overflow: hidden;">
+                                <div style="height: 100%; width: 95%; background: linear-gradient(90deg, #10B981 0%, #34D399 100%); border-radius: 9999px; animation: slideRight 1.9s ease;"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="font-weight: 600; color: #111827;">Équipe Support</span>
+                                <span style="font-weight: 700; color: #F59E0B;">78%</span>
+                            </div>
+                            <div style="width: 100%; height: 12px; background: #E5E7EB; border-radius: 9999px; overflow: hidden;">
+                                <div style="height: 100%; width: 78%; background: linear-gradient(90deg, #F59E0B 0%, #FBBF24 100%); border-radius: 9999px; animation: slideRight 2.1s ease;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Advanced Components -->
+        <section class="section" id="components" data-keywords="composants avancés stats statistiques tableaux">
+            <div class="section-header">
+                <div class="section-icon">🧩</div>
+                <div>
+                    <h2 class="section-title">Composants avancés</h2>
+                    <p class="section-description">Éléments complexes pour interfaces riches</p>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <div class="subsection-header">
+                    <h3 class="subsection-title">Cartes statistiques</h3>
+                    <span class="subsection-badge">Dashboard</span>
+                </div>
+                <div class="cards-grid">
+                    <div class="card">
+                        <div class="card-body">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                                <div>
+                                    <div style="font-size: 0.875rem; color: #6B7280; margin-bottom: 0.25rem;">Utilisateurs actifs</div>
+                                    <div style="font-size: 2rem; font-weight: 700; color: #111827;">1,234</div>
+                                </div>
+                                <div style="width: 48px; height: 48px; background: rgba(55, 65, 81, 0.1); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                                    👥
+                                </div>
+                            </div>
+                            <div style="font-size: 0.875rem; color: #10B981; font-weight: 600;">
+                                ↑ +12% ce mois
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                                <div>
+                                    <div style="font-size: 0.875rem; color: #6B7280; margin-bottom: 0.25rem;">Ventes totales</div>
+                                    <div style="font-size: 2rem; font-weight: 700; color: #111827;">5,678</div>
+                                </div>
+                                <div style="width: 48px; height: 48px; background: rgba(239, 68, 68, 0.1); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                                    📊
+                                </div>
+                            </div>
+                            <div style="font-size: 0.875rem; color: #10B981; font-weight: 600;">
+                                ↑ +8% ce mois
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                                <div>
+                                    <div style="font-size: 0.875rem; color: #6B7280; margin-bottom: 0.25rem;">Revenu</div>
+                                    <div style="font-size: 2rem; font-weight: 700; color: #111827;">45,890€</div>
+                                </div>
+                                <div style="width: 48px; height: 48px; background: rgba(16, 185, 129, 0.1); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                                    💰
+                                </div>
+                            </div>
+                            <div style="font-size: 0.875rem; color: #EF4444; font-weight: 600;">
+                                ↓ -3% ce mois
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <div class="subsection-header">
+                    <h3 class="subsection-title">Liste d'utilisateurs</h3>
+                </div>
+                <div class="demo-container">
+                    <span class="demo-label">Aperçu</span>
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: white; border: 2px solid #E5E7EB; border-radius: 0.75rem; transition: all 0.2s ease;" onmouseover="this.style.borderColor='#374151'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'" onmouseout="this.style.borderColor='#E5E7EB'; this.style.boxShadow='none'">
+                            <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #374151 0%, #4B5563 100%); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                                JD
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: #111827;">Jean Dupont</div>
+                                <div style="font-size: 0.875rem; color: #6B7280;">jean.dupont@email.com</div>
+                            </div>
+                            <span class="badge badge-success">Actif</span>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: white; border: 2px solid #E5E7EB; border-radius: 0.75rem; transition: all 0.2s ease;" onmouseover="this.style.borderColor='#374151'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'" onmouseout="this.style.borderColor='#E5E7EB'; this.style.boxShadow='none'">
+                            <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #EF4444 0%, #F87171 100%); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                                ML
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: #111827;">Marie Lambert</div>
+                                <div style="font-size: 0.875rem; color: #6B7280;">marie.lambert@email.com</div>
+                            </div>
+                            <span class="badge badge-warning">Absent</span>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: white; border: 2px solid #E5E7EB; border-radius: 0.75rem; transition: all 0.2s ease;" onmouseover="this.style.borderColor='#374151'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'" onmouseout="this.style.borderColor='#E5E7EB'; this.style.boxShadow='none'">
+                            <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #10B981 0%, #34D399 100%); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                                PM
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: #111827;">Pierre Martin</div>
+                                <div style="font-size: 0.875rem; color: #6B7280;">pierre.martin@email.com</div>
+                            </div>
+                            <span class="badge badge-primary">Occupé</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <div style="text-align: center; padding: 3rem 0 2rem; color: #6B7280;">
+            <p style="font-size: 1.125rem; margin-bottom: 0.5rem;">✨ Bibliothèque UI complète pour MAUI Blazor</p>
+            <p style="font-size: 0.95rem;">Design harmonisé • Palette Gris Anthracite + Rouge • Prêt à l'emploi</p>
+        </div>
+    </main>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop" onclick="scrollToTop()">↑</button>
+
+    <script>
+        // Toggle sidebar on mobile
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        // Scroll to section
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                // Update active nav item
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                event.target.closest('.nav-item').classList.add('active');
+
+                // Close sidebar on mobile
+                if (window.innerWidth <= 1024) {
+                    document.getElementById('sidebar').classList.remove('open');
+                }
+            }
+        }
+
+        // Copy color code
+        function copyColor(color) {
+            navigator.clipboard.writeText(color).then(() => {
+                // Visual feedback
+                const toast = document.createElement('div');
+                toast.textContent = `Couleur ${color} copiée !`;
+                toast.style.cssText = `
+                    position: fixed;
+                    top: 2rem;
+                    right: 2rem;
+                    background: #10B981;
+                    color: white;
+                    padding: 1rem 1.5rem;
+                    border-radius: 0.75rem;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                    z-index: 10000;
+                    animation: slideInRight 0.3s ease;
+                `;
+                document.body.appendChild(toast);
+                setTimeout(() => {
+                    toast.style.animation = 'slideOutRight 0.3s ease';
+                    setTimeout(() => toast.remove(), 300);
+                }, 2000);
+            });
+        }
+
+        // Filter components with search
+        function filterComponents() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const sections = document.querySelectorAll('.section');
+
+            sections.forEach(section => {
+                const keywords = section.getAttribute('data-keywords') || '';
+                const title = section.querySelector('.section-title')?.textContent || '';
+                const searchContent = (keywords + ' ' + title).toLowerCase();
+
+                if (searchContent.includes(searchTerm)) {
+                    section.style.display = 'block';
+                    section.style.animation = 'fadeInUp 0.3s ease forwards';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+
+            // Show "no results" message if needed
+            const visibleSections = Array.from(sections).filter(s => s.style.display !== 'none');
+            if (visibleSections.length === 0 && searchTerm) {
+                showNoResults();
+            } else {
+                hideNoResults();
+            }
+        }
+
+        function showNoResults() {
+            let noResults = document.getElementById('noResults');
+            if (!noResults) {
+                noResults = document.createElement('div');
+                noResults.id = 'noResults';
+                noResults.style.cssText = `
+                    text-align: center;
+                    padding: 3rem;
+                    color: #6B7280;
+                `;
+                noResults.innerHTML = `
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">🔍</div>
+                    <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; color: #111827;">Aucun résultat</h3>
+                    <p>Essayez avec d'autres mots-clés</p>
+                `;
+                document.querySelector('.main-content').appendChild(noResults);
+            }
+        }
+
+        function hideNoResults() {
+            const noResults = document.getElementById('noResults');
+            if (noResults) {
+                noResults.remove();
+            }
+        }
+
+        // Back to top button
+        window.addEventListener('scroll', () => {
+            const backToTop = document.getElementById('backToTop');
+            if (window.scrollY > 300) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        });
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Highlight active section on scroll
+        const observerOptions = {
+            root: null,
+            rootMargin: '-50% 0px',
+            threshold: 0
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    document.querySelectorAll('.nav-item').forEach(item => {
+                        item.classList.remove('active');
+                        if (item.getAttribute('href') === `#${id}`) {
+                            item.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.section').forEach(section => {
+            observer.observe(section);
+        });
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOutRight {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
