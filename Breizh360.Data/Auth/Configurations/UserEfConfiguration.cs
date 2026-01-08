@@ -1,4 +1,4 @@
-﻿using Breizh360.Domaine.Auth.Users;
+using Breizh360.Domaine.Auth.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,21 +10,30 @@ public sealed class UserEfConfiguration : IEntityTypeConfiguration<User>
     {
         b.ToTable("auth_users");
 
+        // Clé
+        b.Property<Guid>("Id");
         b.HasKey("Id");
 
-        b.Property("Email").HasMaxLength(320);
+        // Colonnes
+        b.Property<string>("Login").HasMaxLength(80).IsRequired();
+        b.HasIndex("Login").IsUnique();
+
+        b.Property<string>("Email").HasMaxLength(320).IsRequired();
         b.HasIndex("Email").IsUnique();
 
         // Hash de mot de passe (nom à adapter si nécessaire)
-        b.Property("PasswordHash").HasMaxLength(512);
+        b.Property<string>("PasswordHash").HasMaxLength(512).IsRequired();
 
-        // Audit / soft delete (si présent dans le Domaine)
-        b.Property("CreatedAt");
-        b.Property("UpdatedAt");
-        b.Property("CreatedBy");
-        b.Property("UpdatedBy");
-        b.Property("IsDeleted");
-        b.Property("DeletedAt");
-        b.Property("DeletedBy");
+        // Audit / soft delete
+        b.Property<DateTimeOffset>("CreatedAt");
+        b.Property<DateTimeOffset?>("UpdatedAt");
+
+        // ActorId (référence logique, type Guid attendu côté Domaine)
+        b.Property<Guid?>("CreatedBy");
+        b.Property<Guid?>("UpdatedBy");
+
+        b.Property<bool>("IsDeleted").HasDefaultValue(false);
+        b.Property<DateTimeOffset?>("DeletedAt");
+        b.Property<Guid?>("DeletedBy");
     }
 }

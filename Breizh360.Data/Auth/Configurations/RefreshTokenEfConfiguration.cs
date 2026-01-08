@@ -1,4 +1,5 @@
-﻿using Breizh360.Domaine.Auth.RefreshTokens;
+using Breizh360.Domaine.Auth.RefreshTokens;
+using Breizh360.Domaine.Auth.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,20 +11,33 @@ public sealed class RefreshTokenEfConfiguration : IEntityTypeConfiguration<Refre
     {
         b.ToTable("auth_refresh_tokens");
 
+        // Clé
+        b.Property<Guid>("Id");
         b.HasKey("Id");
 
+        // FK
+        b.Property<Guid>("UserId");
         b.HasIndex("UserId");
+
+        // Token (hash uniquement)
+        b.Property<string>("TokenHash").HasMaxLength(256).IsRequired();
         b.HasIndex("TokenHash").IsUnique();
 
-        b.Property("TokenHash").HasMaxLength(256); // ex SHA-256 hex/base64 selon votre choix
-        b.Property("ReplacedByTokenHash").HasMaxLength(256);
+        b.Property<string?>("ReplacedByTokenHash").HasMaxLength(256);
 
-        b.Property("ExpiresAt");
-        b.Property("CreatedAt");
-        b.Property("RevokedAt");
-        b.Property("RevokedReason").HasMaxLength(200);
+        b.Property<DateTimeOffset>("ExpiresAt");
+        b.Property<DateTimeOffset>("CreatedAt");
+        b.Property<DateTimeOffset?>("RevokedAt");
+        b.Property<string?>("RevokedReason").HasMaxLength(200);
 
-        b.Property("IsDeleted");
-        b.Property("DeletedAt");
+        // Soft delete
+        b.Property<bool>("IsDeleted").HasDefaultValue(false);
+        b.Property<DateTimeOffset?>("DeletedAt");
+
+        // Relations
+        b.HasOne<User>()
+            .WithMany()
+            .HasForeignKey("UserId")
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

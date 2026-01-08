@@ -1,4 +1,4 @@
-﻿using Breizh360.Domaine.Auth.Roles;
+using Breizh360.Domaine.Auth.Roles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,14 +10,18 @@ public sealed class RoleEfConfiguration : IEntityTypeConfiguration<Role>
     {
         b.ToTable("auth_roles");
 
+        // Clé
+        b.Property<Guid>("Id");
         b.HasKey("Id");
 
-        b.Property("Name").HasMaxLength(120);
+        // Colonnes
+        b.Property<string>("Name").HasMaxLength(120).IsRequired();
         b.HasIndex("Name").IsUnique();
 
-        b.Property("CreatedAt");
-        b.Property("UpdatedAt");
-        b.Property("IsDeleted");
-        b.Property("DeletedAt");
+        // Audit / soft delete
+        b.Property<DateTimeOffset>("CreatedAt");
+        b.Property<DateTimeOffset?>("UpdatedAt");
+        b.Property<bool>("IsDeleted").HasDefaultValue(false);
+        b.Property<DateTimeOffset?>("DeletedAt");
     }
 }

@@ -1,4 +1,4 @@
-﻿using Breizh360.Domaine.Auth.Permissions;
+using Breizh360.Domaine.Auth.Permissions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,14 +10,19 @@ public sealed class PermissionEfConfiguration : IEntityTypeConfiguration<Permiss
     {
         b.ToTable("auth_permissions");
 
+        // Clé
+        b.Property<Guid>("Id");
         b.HasKey("Id");
 
-        b.Property("Key").HasMaxLength(160);
-        b.HasIndex("Key").IsUnique();
+        // Colonnes
+        // NOTE: le contrat Domaine parle de "Code".
+        b.Property<string>("Code").HasMaxLength(160).IsRequired();
+        b.HasIndex("Code").IsUnique();
 
-        b.Property("CreatedAt");
-        b.Property("UpdatedAt");
-        b.Property("IsDeleted");
-        b.Property("DeletedAt");
+        // Audit / soft delete
+        b.Property<DateTimeOffset>("CreatedAt");
+        b.Property<DateTimeOffset?>("UpdatedAt");
+        b.Property<bool>("IsDeleted").HasDefaultValue(false);
+        b.Property<DateTimeOffset?>("DeletedAt");
     }
 }

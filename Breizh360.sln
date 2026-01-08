@@ -7,20 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Breizh360.Api", "Breizh360.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Breizh360.Gateway", "Breizh360.Gateway\Breizh360.Gateway.csproj", "{55555555-5555-5555-5555-555555555555}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Éléments de solution", "Éléments de solution", "{33833F3B-22A5-483A-AB18-017E721557A0}"
-	ProjectSection(SolutionItems) = preProject
-		Docs\00_LIRE_SUIVI_COLLABORATION.md = Docs\00_LIRE_SUIVI_COLLABORATION.md
-		Docs\01_PROMPT_ResponsableSolution.txt = Docs\01_PROMPT_ResponsableSolution.txt
-		Docs\02_PROMPT_Domaine.txt = Docs\02_PROMPT_Domaine.txt
-		Docs\03_PROMPT_Donnees.txt = Docs\03_PROMPT_Donnees.txt
-		Docs\04_PROMPT_Metier.txt = Docs\04_PROMPT_Metier.txt
-		Docs\05_PROMPT_ApiMetier.txt = Docs\05_PROMPT_ApiMetier.txt
-		Docs\06_PROMPT_Gateway.txt = Docs\06_PROMPT_Gateway.txt
-		Docs\07_PROMPT_Tests.txt = Docs\07_PROMPT_Tests.txt
-		Docs\08_PROMPT_UI.txt = Docs\08_PROMPT_UI.txt
-		Docs\suivi_collaboration.html = Docs\suivi_collaboration.html
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Breizh360.Data", "Breizh360.Data\Breizh360.Data.csproj", "{B4B111DB-A35D-4791-808D-34B0536B358C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Breizh360.Metier", "Breizh360.Metier\Breizh360.Metier.csproj", "{336D43AB-3776-4D7B-8BDC-A73072B6D287}"
@@ -30,6 +16,20 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Breizh360.Tests", "Breizh360.Tests\Breizh360.Tests.csproj", "{9F8E5EBF-F0FB-49D4-B978-62F2AC54C243}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Breizh360.UI", "Breizh360.UI\Breizh360.UI.csproj", "{C133DF2E-C97D-4C6E-B36D-2A7C805658D2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projets de tests", "Projets de tests", "{2A52F517-A34B-4950-B931-1992EA4A58A5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Breizh360.Api.Metier.Tests", "Breizh360.Api.Metier.Tests\Breizh360.Api.Metier.Tests.csproj", "{5E40EFEE-E497-948A-814E-D1BA0CD273F2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Breizh360.Data.Tests", "Breizh360.Data.Tests\Breizh360.Data.Tests.csproj", "{5FD5D9C8-0AF2-54D4-0194-8F51F8E88542}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Breizh360.Domaine.Tests", "Breizh360.Domaine.Tests\Breizh360.Domaine.Tests.csproj", "{868069C3-3D3A-5499-A25E-0DFDE442C897}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Breizh360.Gateway.Tests", "Breizh360.Gateway.Tests\Breizh360.Gateway.Tests.csproj", "{85E38357-CDC7-ABDA-9664-DE02462731C5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Breizh360.Metier.Tests", "Breizh360.Metier.Tests\Breizh360.Metier.Tests.csproj", "{8B547A53-76A7-505A-A3BD-DE74740ADE35}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Breizh360.UI.Tests", "Breizh360.UI.Tests\Breizh360.UI.Tests.csproj", "{6CE4F0CB-B7EB-9691-701A-73E9F3DF1938}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -65,9 +65,41 @@ Global
 		{C133DF2E-C97D-4C6E-B36D-2A7C805658D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C133DF2E-C97D-4C6E-B36D-2A7C805658D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C133DF2E-C97D-4C6E-B36D-2A7C805658D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E40EFEE-E497-948A-814E-D1BA0CD273F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E40EFEE-E497-948A-814E-D1BA0CD273F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E40EFEE-E497-948A-814E-D1BA0CD273F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E40EFEE-E497-948A-814E-D1BA0CD273F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5FD5D9C8-0AF2-54D4-0194-8F51F8E88542}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FD5D9C8-0AF2-54D4-0194-8F51F8E88542}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FD5D9C8-0AF2-54D4-0194-8F51F8E88542}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FD5D9C8-0AF2-54D4-0194-8F51F8E88542}.Release|Any CPU.Build.0 = Release|Any CPU
+		{868069C3-3D3A-5499-A25E-0DFDE442C897}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{868069C3-3D3A-5499-A25E-0DFDE442C897}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{868069C3-3D3A-5499-A25E-0DFDE442C897}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{868069C3-3D3A-5499-A25E-0DFDE442C897}.Release|Any CPU.Build.0 = Release|Any CPU
+		{85E38357-CDC7-ABDA-9664-DE02462731C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85E38357-CDC7-ABDA-9664-DE02462731C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85E38357-CDC7-ABDA-9664-DE02462731C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85E38357-CDC7-ABDA-9664-DE02462731C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B547A53-76A7-505A-A3BD-DE74740ADE35}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B547A53-76A7-505A-A3BD-DE74740ADE35}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B547A53-76A7-505A-A3BD-DE74740ADE35}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B547A53-76A7-505A-A3BD-DE74740ADE35}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CE4F0CB-B7EB-9691-701A-73E9F3DF1938}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CE4F0CB-B7EB-9691-701A-73E9F3DF1938}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CE4F0CB-B7EB-9691-701A-73E9F3DF1938}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CE4F0CB-B7EB-9691-701A-73E9F3DF1938}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5E40EFEE-E497-948A-814E-D1BA0CD273F2} = {2A52F517-A34B-4950-B931-1992EA4A58A5}
+		{5FD5D9C8-0AF2-54D4-0194-8F51F8E88542} = {2A52F517-A34B-4950-B931-1992EA4A58A5}
+		{868069C3-3D3A-5499-A25E-0DFDE442C897} = {2A52F517-A34B-4950-B931-1992EA4A58A5}
+		{85E38357-CDC7-ABDA-9664-DE02462731C5} = {2A52F517-A34B-4950-B931-1992EA4A58A5}
+		{8B547A53-76A7-505A-A3BD-DE74740ADE35} = {2A52F517-A34B-4950-B931-1992EA4A58A5}
+		{6CE4F0CB-B7EB-9691-701A-73E9F3DF1938} = {2A52F517-A34B-4950-B931-1992EA4A58A5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B97E0931-70CD-4EB1-A278-714D655F9DF4}

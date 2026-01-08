@@ -1,0 +1,1 @@
+Tests Data (EF Core) : mappings/configurations. Stratégie DB à définir (sans Docker).
