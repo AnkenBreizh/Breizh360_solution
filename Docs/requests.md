@@ -71,17 +71,31 @@
 - **À :** API
 - **Owner :** API
 - **Priorité :** P1
-- **Statut :** Backlog
+- **Statut :** Ready
 - **Nécessaire pour :** `INIT-USR-001` / `USR`
-- **Date cible :** À planifier
+- **Date cible :** 2026-01-12
 - **Détails :**
-  - DTO request/response, erreurs, exemples de payload
-  - Pagination / filtres (si prévu)
+  - **Routes / versioning** : base path (ex: `/api/users`) + stratégie de version (si applicable)
+  - **Endpoints minimum (UI)** :
+    - `GET /users/{id}`
+    - `GET /users` (pagination + filtres)
+    - `POST /users` (création)
+    - `PUT /users/{id}` (édition)
+    - `DELETE /users/{id}` (suppression) *(si prévu)*
+  - **DTOs** (request/response) : `UserDto`, `CreateUserRequest`, `UpdateUserRequest` (+ champs attendus)
+  - **Pagination / filtres** : modèle de réponse paginée, champs obligatoires (page, pageSize, totalCount, items), filtres (email, displayName, tri, recherche)
+  - **Erreurs** : mapping HTTP (400 validation, 401, 403, 404, 409 email déjà utilisé, 500) + structure standard du body d’erreur
+  - **Exemples** : au moins 1 exemple JSON par endpoint clé (`GET list`, `GET by id`, `POST`, `PUT`) + cas d’erreur 409
 - **Critères d’acceptation :**
   - Contrat publié dans `Breizh360.Api/interfaces.md` (sections `IF-API-USR-…`)
   - Exemples utilisables côté UI
 - **Remise attendue :**
   - `/Breizh360.Api/interfaces.md` (IF-API-USR-…)
+  - *(optionnel mais recommandé)* Swagger/OpenAPI activé (pour vérification rapide côté UI)
+  - *(optionnel)* collection Postman / .http Rider
+- **Historique :**
+  - 2026-01-09 : création
+  - 2026-01-09 : complétée (besoins UI pour lever le blocage `USR-UI-001`)
 
 ---
 
@@ -92,29 +106,48 @@
 - **À :** API
 - **Owner :** API
 - **Priorité :** P1
-- **Statut :** Backlog
+- **Statut :** Ready
 - **Nécessaire pour :** `INIT-NOTIF-001` / `NOTIF`
-- **Date cible :** À planifier
+- **Date cible :** 2026-01-12
 - **Détails :**
-  - Noms hubs, méthodes, événements poussés, schémas payload
+  - **Technologie** : SignalR (ou WebSocket brut) + transport(s) autorisés (WebSockets obligatoire ?)
+  - **Route publique** : ex. `/hubs/notifications` (et route via Gateway si différente)
+  - **Auth** : comment passer le token (Header Bearer vs `access_token` querystring SignalR), claims requis
+  - **Événements server -> client** : noms stables + schémas payload (ex: `NotificationReceived`, `UnreadCountChanged`)
+  - **Méthodes client -> server** (si nécessaires) : ack, mark-as-read, subscribe/unsubscribe (groupes)
+  - **Contrats DTO** : `NotificationDto` + enveloppe éventuelle (type, timestamp, version)
+  - **Règles de reconnexion** : comportement attendu (rejoin groupes, replay ?), idempotence
 - **Critères d’acceptation :**
   - Contrat publié dans `Breizh360.Api/interfaces.md` (IF-API-NOTIF-…)
   - UI peut implémenter l’abonnement sans ambiguïté
 - **Remise attendue :**
   - `/Breizh360.Api/interfaces.md` (IF-API-NOTIF-…)
+  - *(optionnel)* exemple de code côté serveur (signature hub) + exemple de client (connexion + handler)
+- **Historique :**
+  - 2026-01-09 : création
+  - 2026-01-09 : complétée (besoins UI pour lever le blocage `NOTIF-UI-001`)
 
 ### `NOTIF-REQ-002` — Proxy Gateway `/hubs/*` + WebSockets (validation)
 - **De :** API
 - **À :** Passerelle
 - **Owner :** Passerelle
 - **Priorité :** P1
-- **Statut :** Backlog
+- **Statut :** Ready
 - **Nécessaire pour :** `INIT-NOTIF-001` / `NOTIF`
-- **Date cible :** À planifier
+- **Date cible :** 2026-01-12
 - **Détails :**
-  - Routage `/hubs/*`, WebSockets, corrélation `X-Correlation-ID`
+  - **Routage** : `/hubs/*` (ou route exacte) vers API + règles de rewrite (si applicable)
+  - **WebSockets** : activé et validé via Gateway (SignalR)
+  - **Headers / observabilité** : propagation `X-Correlation-ID`, logs de connexion/déconnexion, codes d’erreur utiles
+  - **CORS** : autoriser l’origine UI (dev/prod), méthodes/headers nécessaires
+  - **Limites** : timeouts, taille message, keep-alive (valeurs par défaut acceptées ou ajustées)
+  - **Validation** : smoke test documenté (commande/URL) + preuve (capture log ou note) que la connexion passe via Gateway
 - **Critères d’acceptation :**
   - Contrat publié dans `Breizh360.Gateway/interfaces.md` (IF-GATE-NOTIF-…)
   - Validation smoke test (connexion hub via gateway)
 - **Remise attendue :**
   - `/Breizh360.Gateway/interfaces.md` (IF-GATE-NOTIF-…)
+  - (si pertinent) extrait config YARP / ReverseProxy (routes + clusters + websocket)
+- **Historique :**
+  - 2026-01-09 : création
+  - 2026-01-09 : complétée (besoins UI pour lever le blocage `NOTIF-UI-001`)
