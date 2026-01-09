@@ -7,8 +7,11 @@
 
 | ID | Sujet | Statut | Dépendances / blocages | Livrable (remise attendue) | DoD (résumé) |
 |---|---|---|---|---|---|
-| `USR-API-001` | Endpoints `/users` (DTO + erreurs) | Backlog | Contrat `IF-API-USR-001` à finaliser | `Breizh360.Api/Users/...` | Contrat + DTO + erreurs + doc + remise |
-| `NOTIF-API-001` | Hub SignalR + événements | Backlog | Décision d’architecture NOTIF (inbox persistée ? ack/retry ?) + contrat `IF-API-NOTIF-001` | `Breizh360.Api/Notifications/...` (ou `Hubs/...`) | Contrat + méthodes hub + payload + doc + remise |
+| `AUTH-API-001` | Implémenter `/auth/login` + `/auth/refresh` + `/auth/logout` | In progress | `AUTH-REQ-001`, `AUTH-REQ-002` | `Breizh360.Api/Controllers/AuthController.cs` + services Métier | Login/Refresh/Logout opérationnels + erreurs standard + remise |
+| `AUTH-API-002` | Implémenter `GET /me` (claims → `MeContractsMeResponse`) | Backlog | `AUTH-REQ-001` | `Breizh360.Api/Controllers/MeController.cs` | /me renvoie userId/login/email/roles/perms + 401 + remise |
+| `USR-API-001` | (Préparer) Endpoints `/users` (DTO + erreurs) | Backlog | `USR-REQ-002` | `Breizh360.Api/Controllers/UsersController.cs` (à créer) | Contrat + DTO + erreurs + doc + remise |
+| `NOTIF-API-001` | Hub SignalR `/hubs/notifications` + événements | Backlog | `NOTIF-REQ-001` + décision inbox (`ADR-0002`) | `Breizh360.Api/Hubs/NotificationsHub.cs` + mapping Program.cs | Contrat + méthodes hub + payload + doc + remise |
+
 
 ## Notes de pilotage
 - Associer chaque tâche à **un contrat `IF-...`** (ou plusieurs si besoin), et inversement.

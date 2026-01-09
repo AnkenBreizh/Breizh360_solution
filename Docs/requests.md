@@ -39,6 +39,58 @@
 
 ---
 
+## Demandes — AUTH (Authentification / Autorisation)
+
+### `AUTH-REQ-001` — Contrat API Auth + Me (routes + DTO + erreurs)
+- **De :** UI / Solution
+- **À :** API (+ Gateway si routage particulier)
+- **Priorité :** P1
+- **Statut :** Ready
+- **Contexte :**
+  - Les routes existent côté API (`/auth/*`, `/me`) mais retournent **501 Not Implemented**.
+  - La UI et les Tests ont besoin d’un **contrat stable** (DTO, codes d’erreur, claims) avant d’intégrer proprement.
+- **Besoin / livrable :**
+  - Documenter et stabiliser les contrats :
+    - `IF-API-AUTH-001` : `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout`
+    - `IF-API-ME-001` : `GET /me`
+  - Définir :
+    - schémas request/response (DTO actuels ou ajustés),
+    - codes d’erreur (400/401/403/500) + format `ErrorsApiError`,
+    - contenu des claims (roles, permissions, userId/login/email),
+    - règles de durée : `ExpiresInSeconds`, rotation refresh (oui/non), invalidation logout (oui/non).
+- **Critères d’acceptation :**
+  - Contrats publiés dans `Breizh360.Api/interfaces.md` (IF ci-dessus) + exemples de payload
+  - `Breizh360.Api/tasks.md` mis à jour avec tâches `AUTH-API-001` / `AUTH-API-002` et DoD clair
+- **Remise attendue :**
+  - `/Breizh360.Api/interfaces.md` (IF-API-AUTH-001 + IF-API-ME-001)
+  - `/Breizh360.Api/tasks.md` (AUTH-API-001 + AUTH-API-002)
+- **Historique :**
+  - 2026-01-09 : création
+
+### `AUTH-REQ-002` — Contrats Métier/Data pour Auth (services + repos, sans ambiguïté)
+- **De :** API / Solution
+- **À :** Métier + Données + Domaine
+- **Priorité :** P1
+- **Statut :** Backlog
+- **Contexte :**
+  - Les TODO côté API mentionnent un service Métier (validation credentials + émission/refresh tokens).
+  - Risque de collision de noms (`IUserRepository` “users” vs “auth”) et d’appels dynamiques/reflection.
+- **Besoin / livrable :**
+  - Clarifier et publier les interfaces consommées par API :
+    - service d’authentification (validate credentials),
+    - service token (issue/refresh/revoke),
+    - accès aux rôles/permissions de l’utilisateur.
+  - Convention de nommage : éviter les collisions (`IAuthUserRepository` vs `IUserRepository`, ou namespaces explicites).
+- **Critères d’acceptation :**
+  - Contrats publiés dans `Breizh360.Metier/interfaces.md` et/ou `Breizh360.Data/interfaces.md` (IF-…-AUTH-…)
+  - Les TODO API peuvent référencer des interfaces **typiées** (pas de reflection/dynamic)
+- **Remise attendue :**
+  - `/Breizh360.Metier/interfaces.md` (IF-MET-AUTH-…)
+  - `/Breizh360.Data/interfaces.md` (IF-DATA-AUTH-… si pertinent)
+- **Historique :**
+  - 2026-01-09 : création
+
+
 ## Demandes — USR (Users)
 
 ### `USR-REQ-001` — Contrat Domaine Users (entités + repos)

@@ -22,7 +22,7 @@ AVANT DE COMMENCER (obligatoire)
 
 5) Si tu es bloqué par une autre équipe :
    - Ajoute ou complète une demande dans `Docs/requests.md`
-     (ID stable type `AUTH-REQ-XXX`).
+     (ID stable type `XXX-REQ-000`, ex: `AUTH-REQ-001`).
 
 6) À la fin de ton travail :
    - Mets à jour `tasks.md` (**statut + Remise obligatoire**),

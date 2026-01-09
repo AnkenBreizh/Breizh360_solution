@@ -35,3 +35,12 @@ Expose les **interfaces HTTP** (REST) et **temps réel** (SignalR) du métier Br
 - [ ] Tests contractuels / validation DTO
 - [ ] Documentation mise à jour (`interfaces.md`, éventuellement `/Docs/feature_*.md`)
 - [ ] Remise renseignée (chemin + référence commit/PR)
+## Endpoints exposés (actuel)
+- Auth : `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout` (**TODO**: `AUTH-API-001`)
+- Profil : `GET /me` (**TODO**: `AUTH-API-002`)
+- Notifications (SignalR) : `GET/WS /hubs/notifications` (hub)
+
+## Contrats & suivi
+- Contrats : `Breizh360.Api/interfaces.md` (IF-API-…)
+- Tâches : `Breizh360.Api/tasks.md`
+
