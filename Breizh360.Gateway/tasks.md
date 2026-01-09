@@ -1,18 +1,13 @@
 # Tâches — Passerelle
 
-> **Dernière mise à jour :** 2026-01-08
+> 2026-01-09
 
-## À faire
+## USR (Users)
 
-- `SOC-GATE-001` — Proxy `/api/*` + corrélation (`X-Correlation-ID`)
-  - **Dépendances :** `INIT-001`
-  - **Remise attendue :** `Breizh360.Gateway/Program.cs` + `Breizh360.Gateway/interfaces.md` (`IF-GATE-AUTH-001`)
+- `USR-GATE-001` — Proxy /api/users
+  - **Remise attendue :** `Breizh360.Gateway/...`
 
-## En cours
-_Aucun item._
+## NOTIF (Notifications)
 
-## Fini
-_Aucun item._
-
-## Demande
-- Voir `docs/requests.md` (`SOC-REQ-001`)
+- `NOTIF-GATE-001` — Proxy `/hubs/*` + WebSockets
+  - **Remise attendue :** `Breizh360.Gateway/...`

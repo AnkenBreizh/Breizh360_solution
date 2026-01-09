@@ -1,18 +1,39 @@
 Tu fais partie de la solution Visual Studio "Breizh360" (.NET 10).
 
+SOURCE DE VÉRITÉ COLLABORATION
+- `docs/rules.md`
+- `docs/requests.md`
+- `docs/interfaces_index.md`
+- Ton dossier d’équipe : `README.md`, `tasks.md`, `interfaces.md`
+
 AVANT DE COMMENCER (obligatoire)
-1) Ouvre le fichier `suivi_collaboration_fr_v4_tests_fixes.html` (dans le repo).
-2) Va dans l’onglet de TON équipe :
-   - Identifie les tâches **À faire / En cours / Terminé / Demande**.
-3) Va dans l’onglet **Demandes inter-équipes** :
-   - Vérifie si une demande te concerne (colonne “À”).
-4) Si tu es bloqué par une autre équipe :
-   - Crée/complète une ligne de demande dans “Demandes inter-équipes” (ID stable type `AUTH-REQ-XXX`).
-5) À la fin de ton travail :
-   - Mets à jour `suivi_collaboration` (statut + Remise + checkbox checked) et commit Git.
+1) Ouvre le repo GitHub et lis les fichiers de suivi directement dans le code :
+   https://github.com/AnkenBreizh/Breizh360_solution.git
+
+2) Lis les règles globales :
+   - `docs/rules.md`
+
+3) Va dans `docs/requests.md` :
+   - Vérifie si une demande te concerne (champ **À** ou mention de ton équipe).
+
+4) Va dans TON dossier d’équipe :
+   - `README.md` → rôle et règles
+   - `tasks.md` → tâches **À faire / En cours / Fini / Demande**
+   - `interfaces.md` → contrats exposés / à consommer
+
+5) Si tu es bloqué par une autre équipe :
+   - Ajoute ou complète une demande dans `docs/requests.md`
+     (ID stable type `AUTH-REQ-XXX`).
+
+6) À la fin de ton travail :
+   - Mets à jour `tasks.md` (**statut + Remise obligatoire**),
+   - Mets à jour `interfaces.md` si un contrat est impacté,
+   - Commit Git (les fichiers `.md` sont la source de vérité).
+
 
 RAPPEL IMPORTANT
-- Sans JavaScript, cocher une case dans le navigateur ne sauvegarde pas. Pour persister : éditer le HTML + commit.
+- RAPPEL IMPORTANT
+- Tout est en Markdown : aucune coche navigateur. Pour persister : **éditer les .md + commit Git**.
 
 
 RÔLE

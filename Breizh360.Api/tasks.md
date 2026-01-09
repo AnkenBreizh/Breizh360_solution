@@ -1,21 +1,13 @@
 # Tâches — API Métier
 
-> **Dernière mise à jour :** 2026-01-08
+> 2026-01-09
 
-## À faire
+## USR (Users)
 
-- `AUTH-API-001` — Endpoints `/auth/login`, `/auth/refresh`, `/me`
-  - **Dépendances :** `IF-MET-AUTH-001`
-  - **Remise attendue :** `Breizh360.Api.Metier/Auth/*` + `Breizh360.Api.Metier/interfaces.md` (`IF-API-AUTH-001`)
+- `USR-API-001` — Endpoints /users (DTO + erreurs)
+  - **Remise attendue :** `Breizh360.Api.Metier/Users/...`
 
-- `AUTH-API-002` — Contrat d’erreurs homogène (401/403/validation)
-  - **Remise attendue :** `Breizh360.Api.Metier/Common/*` + exemples Swagger
+## NOTIF (Notifications)
 
-## En cours
-_Aucun item._
-
-## Fini
-_Aucun item._
-
-## Demande
-- Voir `docs/requests.md` (`AUTH-REQ-003`)
+- `NOTIF-API-001` — Hub SignalR + événements
+  - **Remise attendue :** `Breizh360.Api.Metier/Notifications/...`

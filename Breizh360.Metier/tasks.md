@@ -1,21 +1,12 @@
 # Tâches — Métier
 
-> **Dernière mise à jour :** 2026-01-08
+> 2026-01-09
 
-## À faire
+## USR (Users)
 
-- `AUTH-MET-001` — Login + émission JWT + refresh
-  - **Dépendances :** `IF-AUTH-001`, `IF-DATA-AUTH-002`
-  - **Remise attendue :** `Breizh360.Metier/Auth/*` + `Breizh360.Metier/interfaces.md` (`IF-MET-AUTH-001`)
+- `USR-MET-001` — Use cases Users (list/get/update)
+  - **Remise attendue :** `Breizh360.Metier/Users/...`
 
-- `AUTH-MET-002` — Refresh rotation + révocation
-  - **Remise attendue :** `Breizh360.Metier/Auth/*`
+## NOTIF (Notifications)
 
-## En cours
-_Aucun item._
-
-## Fini
-_Aucun item._
-
-## Demande
-- Voir `docs/requests.md` (`AUTH-REQ-004`)
+_Optionnel : uniquement si persistance NOTIF (inbox) est décidée._

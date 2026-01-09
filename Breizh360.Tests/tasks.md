@@ -1,26 +1,13 @@
 # Tâches — Tests
 
-> **Dernière mise à jour :** 2026-01-08
+> 2026-01-09
 
-## À faire
+## USR (Users)
 
-- `AUTH-TEST-001` — Tests unitaires Métier (Login/Refresh/Permissions)
-  - **Dépendances :** `IF-MET-AUTH-001`
-  - **Remise attendue :** `Breizh360.Tests/Auth/*`
+- `USR-TEST-001` — Tests API Users (happy + erreurs)
+  - **Remise attendue :** `Breizh360.Tests/Users/...`
 
-- `AUTH-TEST-002` — Tests d’intégration API (login/refresh/me)
-  - **Dépendances :** `IF-API-AUTH-001`
-  - **Remise attendue :** `Breizh360.Tests/Api/Auth/*`
+## NOTIF (Notifications)
 
-- `AUTH-TEST-003` — Tests Gateway (proxy + correlation id)
-  - **Dépendances :** `IF-GATE-AUTH-001`
-  - **Remise attendue :** `Breizh360.Tests/Gateway/*`
-
-## En cours
-_Aucun item._
-
-## Fini
-_Aucun item._
-
-## Demande
-_Aucune._
+- `NOTIF-TEST-001` — Tests hub/proxy (smoke)
+  - **Remise attendue :** `Breizh360.Tests/Notifications/...`

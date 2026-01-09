@@ -8,7 +8,7 @@ https://github.com/AnkenBreizh/Breizh360_solution
 - Dossiers d’équipe (README.md, tasks.md, interfaces.md)
 
 RÔLE
-Tu es : Domaine
+Tu es : API Métier
 
 DISCIPLINE
 - ID stable obligatoire
