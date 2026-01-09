@@ -1,9 +1,9 @@
 Tu fais partie de la solution Visual Studio "Breizh360" (.NET 10).
 
 SOURCE DE VÉRITÉ COLLABORATION
-- `docs/rules.md`
-- `docs/requests.md`
-- `docs/interfaces_index.md`
+- `Docs/rules.md`
+- `Docs/requests.md`
+- `Docs/interfaces_index.md`
 - Ton dossier d’équipe : `README.md`, `tasks.md`, `interfaces.md`
 
 AVANT DE COMMENCER (obligatoire)
@@ -11,9 +11,9 @@ AVANT DE COMMENCER (obligatoire)
    https://github.com/AnkenBreizh/Breizh360_solution.git
 
 2) Lis les règles globales :
-   - `docs/rules.md`
+   - `Docs/rules.md`
 
-3) Va dans `docs/requests.md` :
+3) Va dans `Docs/requests.md` :
    - Vérifie si une demande te concerne (champ **À** ou mention de ton équipe).
 
 4) Va dans TON dossier d’équipe :
@@ -22,7 +22,7 @@ AVANT DE COMMENCER (obligatoire)
    - `interfaces.md` → contrats exposés / à consommer
 
 5) Si tu es bloqué par une autre équipe :
-   - Ajoute ou complète une demande dans `docs/requests.md`
+   - Ajoute ou complète une demande dans `Docs/requests.md`
      (ID stable type `AUTH-REQ-XXX`).
 
 6) À la fin de ton travail :
@@ -52,7 +52,7 @@ SOLUTION VISUAL STUDIO : "Breizh360"
   1) Breizh360.Domaine (Class Library)
   2) Breizh360.Metier (Class Library)
   3) Breizh360.Data (Class Library)
-  4) Breizh360.Api.Metier (ASP.NET Core Web API) = API Métier
+  4) Breizh360.Api (ASP.NET Core Web API) = API Métier
   5) Breizh360.Gateway (ASP.NET Core Web API) = API Gateway
   6) Breizh360.Tests (xUnit)
   7) Breizh360.UI (Application MAUI .NET Blazor Hybrid)
@@ -61,7 +61,7 @@ SOLUTION VISUAL STUDIO : "Breizh360"
 DÉCISIONS D’ARCHITECTURE (source de vérité)
 - Organisation des dossiers : par entité/feature, sans sous-dossiers `Commands/Queries`.
 - Convention fichiers : tous les fichiers commencent par le nom de l’entité (ex: UsersCommandCreate.cs).
-- Auth/JWT : validation dans l’API Métier (Breizh360.Api.Metier) = source d’autorité. La Gateway n’est pas source d’autorité.
+- Auth/JWT : validation dans l’API Métier (Breizh360.Api) = source d’autorité. La Gateway n’est pas source d’autorité.
 - Identity interne : Users + hash + Roles + UserRoles + RefreshTokens (refresh token stocké hashé, rotation prévue).
 - Autorisation : RBAC + ABAC.
 - Audit + Soft delete + Hard delete :
@@ -90,12 +90,12 @@ SECRETS / CONFIGURATION
 ATTENDU
 - Produire/tenir la procédure de création & maintenance de la solution (structure, références, conventions, packages).
 - Définir clairement l’ordre et les critères de remise (Domaine → Données → Métier → API → Passerelle → UI ; Tests transversal).
-- Centraliser les demandes inter-équipes dans `suivi_collaboration`.
+- Centraliser les demandes inter-équipes dans `Docs/requests.md` et le tableau de bord dans `Docs/initiatives.md`.
 - Vérifier que chaque équipe renseigne “Remise : chemin/PR/doc”.
 
 CE QUE JE VEUX EN SORTIE
 1) Une procédure pas-à-pas pour ce que tu dois créer/modifier (références, dossiers, conventions, packages).
-2) La mise à jour de `suivi_collaboration` (tâches, statuts, dépendances, Remise).
+2) La mise à jour de `Docs/initiatives.md` et `Docs/requests.md` (statuts, dépendances, Remise).
 
 RÈGLES
 - Ne propose pas de projet Shared.

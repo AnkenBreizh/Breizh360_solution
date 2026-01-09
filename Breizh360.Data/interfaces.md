@@ -1,5 +1,11 @@
 # Interfaces — Couche Données (Breizh360.Data)
 
+> **Dernière mise à jour :** 2026-01-09  
+> **Version des contrats :** 0.1.0 (Stable)  
+> **Responsable :** Équipe Données  
+> **Règle de changement :** breaking change ⇒ nouvelle version majeure + REQ + note de migration
+
+
 Ce fichier documente les **contrats** exposés par la couche Données. Il sert de référence fonctionnelle
 pour les autres équipes (Métier, API, Tests, Solution) et permet d'identifier les changements **cassants**.
 

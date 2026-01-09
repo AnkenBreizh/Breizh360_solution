@@ -1,7 +1,9 @@
 # Interfaces exposées — Domaine
 
-> 2026-01-09
-
+> **Dernière mise à jour :** 2026-01-09  
+> **Version des contrats :** 0.1.0 (Draft)  
+> **Responsable :** Équipe Domaine  
+> **Règle de changement :** breaking change ⇒ nouvelle version majeure + REQ + note de migration
 ## USR (Users)
 
 ### `IF-USR-001` — Contrat domaine Users (Aggregate + Repository)
@@ -60,9 +62,75 @@ await userRepository.AddAsync(user, ct);
 
 ## NOTIF (Notifications)
 
-### `IF-NOTIF-001` — Contrat domaine Notifications (Inbox)
+### `IF-NOTIF-001` — Contrat domaine Notifications (Inbox persistée — Option A)
 
-- **Statut :** ⏳ *Backlog (optionnel)*
-- **Responsabilité :** Modéliser une inbox persistée (si décision validée).
-- **Consommateurs :** `Breizh360.Data`, `Breizh360.Metier`
-- **Contrat / Exemple / Erreurs / Remise :** à compléter une fois la décision prise.
+- **Statut :** ✅ *Décision validée (Inbox persistée)* / 🚧 *Implémentation à faire*
+- **Responsabilité :**
+  - Modéliser une **inbox de notifications persistée** (cycle de vie, retry, expiration)
+  - Garantir la **traçabilité** (audit) et la **rejouabilité**
+  - Encadrer l’**idempotence** (anti-doublons) via une clé fonctionnelle si nécessaire
+- **Consommateurs :**
+  - `Breizh360.Data` (persistance EF/SQL, index/contraintes)
+  - `Breizh360.Metier` (use-cases : créer, planifier, envoyer, relancer, marquer)
+  - `Breizh360.Api` (exposition éventuelle via Métier : inbox utilisateur, actions)
+- **Contrat :**
+  - Types : `Notifications.Entities.Notification`, `Notifications.ValueObjects.NotificationId`,
+    `Notifications.ValueObjects.NotificationType`, `Notifications.ValueObjects.NotificationStatus`
+  - Repository : `INotificationRepository`
+  - Sender/Dispatcher : `INotificationSender`
+
+```csharp
+namespace Breizh360.Domaine.Notifications.Repositories;
+
+public interface INotificationRepository
+{
+    Task<Entities.Notification?> GetByIdAsync(ValueObjects.NotificationId id, CancellationToken ct = default);
+
+    /// <summary>
+    /// Récupère un lot de notifications à traiter (Pending et échéance atteinte).
+    /// Le paramètre utcNow est passé par la couche applicative (testabilité).
+    /// </summary>
+    Task<IReadOnlyList<Entities.Notification>> FindPendingDueAsync(
+        DateTime utcNow,
+        int limit,
+        CancellationToken ct = default);
+
+    /// <summary>
+    /// Anti-doublon (Optionnel mais recommandé si plusieurs sources peuvent produire la même notif).
+    /// À faire respecter par l'implémentation Data (index unique ou contrainte).
+    /// </summary>
+    Task<bool> ExistsByIdempotencyKeyAsync(
+        Guid userId,
+        string idempotencyKey,
+        CancellationToken ct = default);
+
+    Task AddAsync(Entities.Notification notification, CancellationToken ct = default);
+    Task UpdateAsync(Entities.Notification notification, CancellationToken ct = default);
+}
+```
+
+```csharp
+namespace Breizh360.Domaine.Notifications.Senders;
+
+public interface INotificationSender
+{
+    /// <summary>
+    /// Envoi effectif sur le(s) canal(aux) cible(s).
+    /// La persistance et les transitions de statut sont gérées par la couche applicative + domaine.
+    /// </summary>
+    Task SendAsync(Notifications.Entities.Notification notification, CancellationToken ct = default);
+}
+```
+
+- **Erreurs / règles :**
+  - Invariants de construction et transitions de statut : `DomainException`
+  - Unicité `IdempotencyKey` (si activée) : imposée par Data (index unique), remontée via Métier/API
+  - Workflow recommandé : `Pending → Sent` | `Pending → Failed (avec retry)` | `Pending → Expired/Cancelled`
+- **Remise (à produire) :**
+  - `Breizh360.Domaine/Notifications/Entities/Notification.cs`
+  - `Breizh360.Domaine/Notifications/ValueObjects/NotificationId.cs`
+  - `Breizh360.Domaine/Notifications/ValueObjects/NotificationType.cs`
+  - `Breizh360.Domaine/Notifications/ValueObjects/NotificationStatus.cs`
+  - `Breizh360.Domaine/Notifications/Repositories/INotificationRepository.cs`
+  - `Breizh360.Domaine/Notifications/Senders/INotificationSender.cs`
+  - (si retenu) `Breizh360.Domaine/Notifications/ValueObjects/IdempotencyKey.cs`

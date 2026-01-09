@@ -1,15 +1,20 @@
 # Breizh360 — Collaboration (Markdown)
 
-> **Dernière mise à jour : 08 / 01 / 2026**
+> **Dernière mise à jour : 09 / 01 / 2026**
 
 Ce dossier **remplace** l'ancien fichier HTML unique de suivi. Toute modification doit être **committée**.
 
 ## Entrées principales
 
-- Règles globales : [`docs/rules.md`](docs/rules.md)
-- Demandes inter-équipes : [`docs/requests.md`](docs/requests.md)
-- Index des interfaces : [`docs/interfaces_index.md`](docs/interfaces_index.md)
+- Démarrage (onboarding) : [`Docs/onboarding.md`](Docs/onboarding.md)
+- Tableau de bord (initiatives) : [`Docs/initiatives.md`](Docs/initiatives.md)
+- Règles globales : [`Docs/rules.md`](Docs/rules.md)
+- Demandes inter-équipes : [`Docs/requests.md`](Docs/requests.md)
+- Index des interfaces : [`Docs/interfaces_index.md`](Docs/interfaces_index.md)
+- Registre des risques : [`Docs/risks.md`](Docs/risks.md)
+- Décisions d’architecture (ADRs) : [`Docs/decisions/README.md`](Docs/decisions/README.md)
 
-## Vue générale (initiatives)
+## Vue générale
 
-Voir `docs/rules.md` (ordre + règles) et les initiatives dans `docs/rules.md` (section “Initiatives”).
+- Les **initiatives** (quoi / qui / statut / prochaine étape) sont suivies dans `Docs/initiatives.md`.
+- Les **blocages** et **dépendances inter-équipes** passent par `Docs/requests.md` (ID stable + remise attendue).

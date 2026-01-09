@@ -2,9 +2,10 @@ SOURCE DE VÉRITÉ COLLABORATION (GitHub)
 https://github.com/AnkenBreizh/Breizh360_solution
 
 À LIRE
-- /docs/rules.md  (features : AUTH / USR / NOTIF)
-- /docs/requests.md
-- /docs/interfaces_index.md
+- /Docs/rules.md  (features : AUTH / USR / NOTIF)
+- /Docs/requests.md
+- /Docs/interfaces_index.md
+- /Docs/initiatives.md  (tableau de bord : quoi / qui / statut)
 - Dossiers d’équipe (README.md, tasks.md, interfaces.md)
 
 RÔLE
@@ -17,4 +18,4 @@ DISCIPLINE
 
 ACCÈS AUX INTERFACES DES AUTRES ÉQUIPES
 Tu peux et dois consulter les `interfaces.md` des autres équipes selon tes besoins.
-Interface non documentée = inexistante. Flou = demande dans `/docs/requests.md`.
+Interface non documentée = inexistante. Flou = demande dans `/Docs/requests.md`.

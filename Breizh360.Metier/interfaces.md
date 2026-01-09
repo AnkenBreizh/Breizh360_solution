@@ -1,7 +1,9 @@
 # Interfaces exposées — Métier
 
-> 2026-01-09
-
+> **Dernière mise à jour :** 2026-01-09  
+> **Version des contrats :** 0.1.0 (Draft)  
+> **Responsable :** Équipe Métier  
+> **Règle de changement :** breaking change ⇒ nouvelle version majeure + REQ + note de migration
 ## USR (Users)
 
 ### `IF-USR-001` — (à compléter)

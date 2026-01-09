@@ -1,1 +1,0 @@
-Tests unitaires UI. Si bUnit est utilisé, ajouter le package bunit et cibler des composants Blazor.
