@@ -1,8 +1,7 @@
-SOURCE DE VÉRITÉ COLLABORATION (GitHub)
-https://github.com/AnkenBreizh/Breizh360_solution
+SOURCE DE VÉRITÉ COLLABORATION
 
 À LIRE
-- /Docs/rules.md  (features : AUTH / USR / NOTIF)
+- /Docs/rules.md
 - /Docs/requests.md
 - /Docs/interfaces_index.md
 - /Docs/initiatives.md  (tableau de bord : quoi / qui / statut)

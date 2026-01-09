@@ -18,7 +18,7 @@ La couche Données :
 - **consomme** : `Breizh360.Domaine` (entités + interfaces de repositories)
 - **produit** : implémentations EF Core de ces interfaces + schéma de base (migrations) + seed Dev
 
-Les contrats ci-dessous sont alignés avec les tests contractuels de `Breizh360.Data.Tests`.
+Les contrats ci-dessous s’appuient sur le code et les migrations EF Core du module.
 
 ---
 
@@ -106,12 +106,12 @@ Garantir la disponibilité des implémentations EF Core des interfaces de reposi
 
 - *Tracking EF* : privilégier `AsNoTracking()` pour les lectures purement consultatives (si cohérent avec le domaine).
 - *Transactions* : la frontière transactionnelle est portée par la couche applicative/métier (ou par l’hôte), pas par un repository isolé.
-- *Migrations* : toute évolution du schéma doit être accompagnée d’une nouvelle migration + mise à jour des tests contractuels.
+- *Migrations* : toute évolution du schéma doit être accompagnée d’une nouvelle migration (et d’une note de migration en cas de breaking change).
 
 ---
 
 ## Hors périmètre (pour l’instant)
 
-- Câblage DI / composition root (API/Gateway/…)
+- Composition root (API/Gateway/…) au-delà de l’appel à `AddBreizh360Data(...)`
 - Stratégie CI/CD d'application des migrations
 - Observabilité (logs/metrics) au niveau persistence (à définir globalement dans la solution)

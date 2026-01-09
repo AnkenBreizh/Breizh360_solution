@@ -8,6 +8,9 @@
 
 Le `Breizh360DbContextFactory` (DesignTime) essaie d’abord la variable d’environnement, puis un `appsettings.Development.json` situé dans un projet API au même niveau que la solution.
 
+> Recommandé : dans le projet hôte (API/Worker), utilisez `builder.Services.AddBreizh360Data(builder.Configuration)`
+> pour centraliser la configuration du DbContext et des repositories.
+
 ## EF Core — Migrations
 
 Créer une migration (si vous en régénérez une) :

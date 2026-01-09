@@ -15,7 +15,15 @@ public sealed class Breizh360DbContextFactory : IDesignTimeDbContextFactory<Brei
         if (string.IsNullOrWhiteSpace(cs))
         {
             var basePath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
-            var apiPath = Path.Combine(basePath, "Breizh360.Api.Metier");
+
+            // Le projet hôte peut évoluer (ex: Breizh360.Api). On essaie plusieurs dossiers connus.
+            var candidateApiPaths = new[]
+            {
+                Path.Combine(basePath, "Breizh360.Api"),
+                Path.Combine(basePath, "Breizh360.Api.Metier"),
+            };
+
+            var apiPath = candidateApiPaths.FirstOrDefault(Directory.Exists) ?? basePath;
 
             var config = new ConfigurationBuilder()
                 .SetBasePath(apiPath)

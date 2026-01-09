@@ -7,8 +7,7 @@ SOURCE DE VÉRITÉ COLLABORATION
 - Ton dossier d’équipe : `README.md`, `tasks.md`, `interfaces.md`
 
 AVANT DE COMMENCER (obligatoire)
-1) Ouvre le repo GitHub et lis les fichiers de suivi directement dans le code :
-   https://github.com/AnkenBreizh/Breizh360_solution.git
+1) Ouvre Breizh360.zip
 
 2) Lis les règles globales :
    - `Docs/rules.md`
@@ -59,7 +58,7 @@ SOLUTION VISUAL STUDIO : "Breizh360"
 - Pas de projet Shared/Contracts.
 
 DÉCISIONS D’ARCHITECTURE (source de vérité)
-- Organisation des dossiers : par entité/feature, sans sous-dossiers `Commands/Queries`.
+- Organisation des dossiers : par entité/feature.
 - Convention fichiers : tous les fichiers commencent par le nom de l’entité (ex: UsersCommandCreate.cs).
 - Auth/JWT : validation dans l’API Métier (Breizh360.Api) = source d’autorité. La Gateway n’est pas source d’autorité.
 - Identity interne : Users + hash + Roles + UserRoles + RefreshTokens (refresh token stocké hashé, rotation prévue).

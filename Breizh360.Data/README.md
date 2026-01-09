@@ -34,7 +34,34 @@ La partie Auth est structurée autour de :
 3. **(Optionnel) Seed Dev**
    - Utiliser `Auth/Seed/AuthSeedDev.cs` pour initialiser un jeu de données de dev (utilisateurs/roles/permissions).
 
-> Remarque : le câblage DI (enregistrement du DbContext + repositories) est généralement fait dans l’application hôte.
+> Remarque : le câblage DI (enregistrement du DbContext + repositories) est fait dans l’application hôte —
+> idéalement via l’extension <c>AddBreizh360Data(...)</c> ci-dessous.
+
+## Intégration (DI) — recommandé
+
+Le module expose un point d’entrée DI pour standardiser l’intégration depuis la *composition root*
+(API, Worker, Gateway...).
+
+Dans votre projet hôte :
+
+```csharp
+using Breizh360.Data;
+
+builder.Services.AddBreizh360Data(builder.Configuration);
+```
+
+Par défaut, l’extension lit la connection string **`ConnectionStrings:Postgres`**
+(ou variable d’environnement `ConnectionStrings__Postgres`).
+
+Options (ex: DEV) :
+
+```csharp
+builder.Services.AddBreizh360Data(builder.Configuration, o =>
+{
+  o.EnableDetailedErrors = true;
+  o.EnableSensitiveDataLogging = true;
+});
+```
 
 ## Contrats / Interfaces (références)
 
