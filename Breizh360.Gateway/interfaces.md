@@ -1,7 +1,7 @@
 # Interfaces exposées — Passerelle (Breizh360.Gateway)
 
-> **Dernière mise à jour :** 2026-01-09  
-> **Version des contrats :** 0.2.0 (Draft)  
+> **Dernière mise à jour :** 2026-01-10  
+> **Version des contrats :** 0.3.0 (Draft)  
 > **Responsable :** Équipe Passerelle  
 > **Règle de changement :** breaking change ⇒ nouvelle version majeure + demande (REQ) + note de migration
 
@@ -32,16 +32,15 @@
 - **Responsabilité :** forward des requêtes HTTP(s) vers le cluster API.
 - **Consommateurs :** UI / clients.
 - **Contrat :**
-  - **Entrée :** `/{api}/{**catch-all}` (préfixe `/api/`)
+  - **Entrée :** `/api/{**catch-all}`
   - **Sortie :** même path et query string, vers la destination configurée (`ReverseProxy:Clusters:api`).
   - **Méthodes :** toutes (GET/POST/PUT/PATCH/DELETE…).
-  - **Transformations :**
-    - Ajout / propagation de `X-Correlation-ID` (voir `IF-GATE-OBS-001`).
+  - **Transformations :** propagation de `X-Correlation-ID` (voir `IF-GATE-OBS-001`).
 - **Auth (côté Gateway) :**
-  - Si route protégée : présence + format `Authorization: Bearer <jwt>` requis (contrôle léger).
+  - Si route protégée : présence + format `Authorization: Bearer <jwt>` requis (**contrôle léger**).
   - Exemptions via `Gateway:Auth:AnonymousPathPrefixes`.
 - **Erreurs générées par la Passerelle :**
-  - `401` si header Authorization manquant/invalid (payload `GatewayError`).
+  - `401` si token manquant/invalid (payload `GatewayError`).
   - `429` si rate limit atteint (payload `GatewayError`).
   - `502` si exception non gérée dans la pipeline Gateway (payload `GatewayError`).
 - **Références (métier) :** contrats API Users (DTO/erreurs) côté **API**.
@@ -61,11 +60,17 @@
   - **Sortie :** même path et query string vers `ReverseProxy:Clusters:api`.
   - **Transport :** WebSockets supporté par YARP, fallback HTTP si nécessaire (selon client SignalR).
   - **Transformations :** propagation `X-Correlation-ID`.
-- **Auth (côté Gateway) :** même règle que `IF-GATE-USR-001`.
+- **Auth (côté Gateway) :**
+  - Contrôle léger du token :
+    - `Authorization: Bearer <jwt>` (**recommandé**)
+    - **ou** `access_token=<jwt>` en querystring (SignalR navigateur), si `Gateway:Auth:AllowAccessTokenQueryForHubs=true`.
+  - Exemptions via `Gateway:Auth:AnonymousPathPrefixes`.
+  - ⚠️ L’API reste responsable de l’extraction/validation du token pour les hubs (ex: `JwtBearerEvents.OnMessageReceived`).
 - **Références (métier) :** contrats Hub/payload côté **API**.
 - **Remise :**
   - `Breizh360.Gateway/Program.cs`
   - `Breizh360.Gateway/appsettings.json`
+  - `Breizh360.Gateway/Auth/GatewayJwtForwardingMiddleware.cs`
 
 ---
 
@@ -80,7 +85,7 @@
   - Le header est propagé vers l’API via transform YARP.
 - **Remise :**
   - `Breizh360.Gateway/Observability/GatewayCorrelationIdMiddleware.cs`
-  - `Breizh360.Gateway/Program.cs`
+  - `Breizh360.Gateway/ReverseProxy/GatewayReverseProxyExtensions.cs`
 
 ### `IF-GATE-ERR-001` — Erreurs Gateway normalisées
 - **Responsabilité :** normaliser les erreurs générées par la Passerelle.
@@ -95,3 +100,4 @@
   - `Breizh360.Gateway/Errors/GatewayError.cs`
   - `Breizh360.Gateway/Errors/GatewayErrorMiddleware.cs`
   - `Breizh360.Gateway/Auth/GatewayJwtForwardingMiddleware.cs`
+  - `Breizh360.Gateway/Common/CommonRateLimitingExtensions.cs`

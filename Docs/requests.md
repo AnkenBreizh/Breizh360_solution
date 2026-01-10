@@ -1,6 +1,6 @@
 # Demandes inter-équipes — Breizh360
 
-> **Dernière mise à jour :** 2026-01-09  
+> **Dernière mise à jour :** 2026-01-10  
 > **Source :** https://github.com/AnkenBreizh/Breizh360_solution
 
 ## Règles
@@ -132,7 +132,7 @@
 - **À :** Passerelle
 - **Owner :** Passerelle
 - **Priorité :** P1
-- **Statut :** Ready
+- **Statut :** Done
 - **Nécessaire pour :** `INIT-NOTIF-001` / `NOTIF`
 - **Date cible :** 2026-01-12
 - **Détails :**
@@ -145,12 +145,16 @@
 - **Critères d’acceptation :**
   - Contrat publié dans `Breizh360.Gateway/interfaces.md` (IF-GATE-NOTIF-…)
   - Validation smoke test (connexion hub via gateway)
-- **Remise attendue :**
-  - `/Breizh360.Gateway/interfaces.md` (IF-GATE-NOTIF-…)
-  - (si pertinent) extrait config YARP / ReverseProxy (routes + clusters + websocket)
+- **Remise :**
+  - `/Breizh360.Gateway/interfaces.md` (IF-GATE-NOTIF-001, IF-GATE-ERR-001)
+  - `/Breizh360.Gateway/Program.cs`
+  - `/Breizh360.Gateway/ReverseProxy/GatewayReverseProxyExtensions.cs`
+  - `/Breizh360.Gateway/Auth/GatewayJwtForwardingMiddleware.cs`
+  - `/Breizh360.Gateway/README.md` (smoke tests)
 - **Historique :**
   - 2026-01-09 : création
   - 2026-01-09 : complétée (besoins UI pour lever le blocage `NOTIF-UI-001`)
+  - 2026-01-10 : Done (impl proxy hubs + token query configurable + rate limiting JSON + smoke tests)
 
 
 ### `NOTIF-REQ-003` — Contrat Domaine Inbox (entités + repository + erreurs)

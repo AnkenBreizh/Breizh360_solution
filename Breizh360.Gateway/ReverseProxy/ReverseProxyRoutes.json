@@ -1,19 +1,25 @@
 {
   "ReverseProxy": {
     "Routes": {
-      "api": {
-        "ClusterId": "apiCluster",
-        "Match": { "Path": "/api/{**catch-all}" }
+      "route_api": {
+        "ClusterId": "api",
+        "Match": {
+          "Path": "/api/{**catch-all}"
+        }
       },
-      "signalr": {
-        "ClusterId": "apiCluster",
-        "Match": { "Path": "/hubs/{**catch-all}" }
+      "route_hubs": {
+        "ClusterId": "api",
+        "Match": {
+          "Path": "/hubs/{**catch-all}"
+        }
       }
     },
     "Clusters": {
-      "apiCluster": {
+      "api": {
         "Destinations": {
-          "api": { "Address": "https://localhost:5001/" }
+          "api_1": {
+            "Address": "https://localhost:5101/"
+          }
         }
       }
     }

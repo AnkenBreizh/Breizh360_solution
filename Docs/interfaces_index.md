@@ -1,6 +1,6 @@
 # Index des interfaces exposées — Breizh360
 
-> **Dernière mise à jour :** 2026-01-09  
+> **Dernière mise à jour :** 2026-01-10  
 > **Source :** https://github.com/AnkenBreizh/Breizh360_solution
 
 Chaque équipe publie ses **contrats** dans `interfaces.md`.
