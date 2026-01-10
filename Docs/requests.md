@@ -162,7 +162,7 @@
 - **À :** Domaine
 - **Owner :** Domaine
 - **Priorité :** P1
-- **Statut :** Ready
+- **Statut :** Done
 - **Nécessaire pour :** `INIT-NOTIF-001` / `NOTIF`
 - **Date cible :** 2026-01-12
 - **Détails :**
@@ -172,9 +172,19 @@
 - **Critères d’acceptation :**
   - Contrat publié/complété dans `Breizh360.Domaine/interfaces.md` (`IF-NOTIF-001`)
   - Remise = chemins des entités + repo + exceptions éventuelles
-- **Remise attendue :**
+- **Remise :**
   - `/Breizh360.Domaine/interfaces.md` (IF-NOTIF-001)
-  - `/Breizh360.Domaine/Notifications/...`
+  - `/Breizh360.Domaine/Notifications/Entities/Notification.cs`
+  - `/Breizh360.Domaine/Notifications/ValueObjects/NotificationId.cs`
+  - `/Breizh360.Domaine/Notifications/ValueObjects/NotificationType.cs`
+  - `/Breizh360.Domaine/Notifications/ValueObjects/NotificationStatus.cs`
+  - `/Breizh360.Domaine/Notifications/ValueObjects/IdempotencyKey.cs`
+  - `/Breizh360.Domaine/Notifications/Repositories/INotificationRepository.cs`
+  - `/Breizh360.Domaine/Notifications/Senders/INotificationSender.cs`
+
+- **Historique :**
+  - 2026-01-09 : création
+  - 2026-01-10 : Done (contrat + modèle domaine NOTIF livrés)
 
 ### `NOTIF-REQ-004` — Persistance EF + migrations Inbox (tables + index + repo)
 - **De :** Domaine

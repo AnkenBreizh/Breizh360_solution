@@ -79,7 +79,7 @@ await userRepository.AddAsync(user, ct);
 
 ### `IF-NOTIF-001` — Contrat domaine Notifications (Inbox persistée)
 
-- **Statut :** ✅ *Décision validée (Inbox persistée)* / 🚧 *Implémentation à faire*
+- **Statut :** ✅ *Décision validée (Inbox persistée)* / ✅ *Implémentation Domaine livrée*
 - **Décision :** `Docs/decisions/ADR-0002-notif-inbox.md`
 - **Responsabilité :**
   - Modéliser une **inbox de notifications persistée** (cycle de vie, retry, expiration)
@@ -142,11 +142,11 @@ public interface INotificationSender
   - Invariants de construction et transitions de statut : `DomainException`
   - Unicité `IdempotencyKey` (si activée) : imposée par Data (index unique), remontée via Métier/API
   - Workflow recommandé : `Pending → Sent` | `Pending → Failed (avec retry)` | `Pending → Expired/Cancelled`
-- **Remise (à produire) :**
+- **Remise :**
   - `Breizh360.Domaine/Notifications/Entities/Notification.cs`
   - `Breizh360.Domaine/Notifications/ValueObjects/NotificationId.cs`
   - `Breizh360.Domaine/Notifications/ValueObjects/NotificationType.cs`
   - `Breizh360.Domaine/Notifications/ValueObjects/NotificationStatus.cs`
+  - `Breizh360.Domaine/Notifications/ValueObjects/IdempotencyKey.cs`
   - `Breizh360.Domaine/Notifications/Repositories/INotificationRepository.cs`
   - `Breizh360.Domaine/Notifications/Senders/INotificationSender.cs`
-  - (si retenu) `Breizh360.Domaine/Notifications/ValueObjects/IdempotencyKey.cs`
