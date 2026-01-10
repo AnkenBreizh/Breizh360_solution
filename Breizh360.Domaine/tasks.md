@@ -18,7 +18,8 @@
 
 - `AUTH-DOM-002` — Contrats repos Auth — ✅ **Fini (remis)**
   - **Remise :**
-    - `Breizh360.Domaine/Auth/Users/IUserRepository.cs`
+    - `Breizh360.Domaine/Auth/Users/IAuthUserRepository.cs`
+    - `Breizh360.Domaine/Auth/Users/IUserRepository.cs` *(alias Obsolete)*
     - `Breizh360.Domaine/Auth/Roles/IRoleRepository.cs`
     - `Breizh360.Domaine/Auth/Permissions/IPermissionRepository.cs`
     - `Breizh360.Domaine/Auth/RefreshTokens/IRefreshTokenRepository.cs`

@@ -52,7 +52,8 @@ public static class Breizh360DataServiceCollectionExtensions
         }
 
         // Repositories Auth (⚠️ attention à l’ambiguïté IUserRepository dans la solution)
-        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IAuthUserRepository, UserRepository>();
+        services.AddScoped<IUserRepository>(sp => sp.GetRequiredService<IAuthUserRepository>());
         services.AddScoped<IRoleRepository, RoleRepository>();
         services.AddScoped<IPermissionRepository, PermissionRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();

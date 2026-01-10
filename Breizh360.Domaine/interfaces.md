@@ -1,9 +1,24 @@
 # Interfaces exposées — Domaine
 
-> **Dernière mise à jour :** 2026-01-09  
-> **Version des contrats :** 0.1.0 (Draft)  
+> **Dernière mise à jour :** 2026-01-10  
+> **Version des contrats :** 0.2.0 (Draft)  
 > **Responsable :** Équipe Domaine  
 > **Règle de changement :** breaking change ⇒ nouvelle version majeure + REQ + note de migration
+
+## AUTH (Authentification / Autorisation)
+
+### `IF-AUTH-001` — Contrats domaine Auth (Users, Roles, Permissions, RefreshTokens)
+
+- **Responsabilité :**
+  - Modéliser l’authentification et l’autorisation (invariants, entités, value objects)
+  - Exposer des **contrats de persistance** dédiés (repositories) par agrégat
+- **Contrats exposés :**
+  - `IAuthUserRepository` *(AUTH)* — accès au user d’authentification (login/email, soft delete, rôles)
+  - `IRoleRepository`, `IPermissionRepository`, `IRefreshTokenRepository`
+- **Note compatibilité :**
+  - `IUserRepository` dans `Breizh360.Domaine.Auth.Users` est conservé comme **alias historique** marqué `[Obsolete]`.
+  - Le domaine USR conserve `Breizh360.Domaine.Users.Repositories.IUserRepository` pour le profil métier.
+
 ## USR (Users)
 
 ### `IF-USR-001` — Contrat domaine Users (Aggregate + Repository)

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Breizh360.Data.Auth.Repositories;
 
-public sealed class UserRepository : IUserRepository
+public sealed class UserRepository : IAuthUserRepository
 {
     private readonly Breizh360DbContext _db;
 
