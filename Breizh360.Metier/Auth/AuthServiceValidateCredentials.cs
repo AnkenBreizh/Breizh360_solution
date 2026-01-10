@@ -1,5 +1,10 @@
+using System;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Breizh360.Domaine.Auth.Users;
 
 namespace Breizh360.Metier.Auth;
 
@@ -7,95 +12,68 @@ namespace Breizh360.Metier.Auth;
 /// AUTH-BIZ-001 — Validation identifiants.
 /// Objectif :
 /// - normaliser login/email
-/// - récupérer l'utilisateur via dépôt
-/// - vérifier l'état verrouillé
+/// - récupérer l'utilisateur via dépôt typé
+/// - vérifier l'état verrouillé (future implémentation)
 /// - comparer le mot de passe en temps constant
 ///
-/// Notes :
-/// - Le Domaine doit rester source de vérité sur le format exact du hash.
-/// - Ce service supporte plusieurs formats "compat" (PBKDF2 + fallback SHA256) pour éviter de bloquer l'intégration.
+/// Cette version remplace l'ancienne implémentation basée sur la réflexion.
+/// Elle dépend d'un repository fort typé <see cref="IAuthUserRepository"/> et
+/// améliore la lisibilité ainsi que la sécurité de typage.
 /// </summary>
 public sealed class AuthServiceValidateCredentials
 {
-    private readonly object _userRepository;
+    private readonly IAuthUserRepository _userRepository;
 
-    public AuthServiceValidateCredentials(object userRepository)
+    public AuthServiceValidateCredentials(IAuthUserRepository userRepository)
     {
         _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
     }
 
     /// <summary>
-    /// Tentative de validation. Retourne IsValid=false sans révéler la raison (user inconnu vs mauvais mdp).
-    /// Peut lever <see cref="AuthExceptionUserLocked"/> si le compte est verrouillé.
+    /// Tentative de validation. Retourne IsValid=false sans révéler la raison
+    /// (user inconnu vs mauvais mdp). Peut lever <see cref="AuthExceptionUserLocked"/>
+    /// dans une implémentation future.
     /// </summary>
-    public async Task<AuthServiceValidateCredentialsResult<dynamic>> TryValidateAsync(
+    public async Task<AuthServiceValidateCredentialsResult<User?>> TryValidateAsync(
         string loginOrEmail,
         string password,
         CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(loginOrEmail) || string.IsNullOrEmpty(password))
-            return new AuthServiceValidateCredentialsResult<dynamic>(false, null);
+            return new AuthServiceValidateCredentialsResult<User?>(false, null);
 
+        // Normalisation : trim + lower invariant
         var key = NormalizeLoginOrEmail(loginOrEmail);
 
-        // 1) Récupérer user (meilleur effort sur les signatures courantes)
-        dynamic? user = await RepoInvoke.CallFirstAsync<dynamic>(
-            _userRepository,
-            new[]
-            {
-                "GetByLoginOrEmailAsync",
-                "FindByLoginOrEmailAsync",
-                "GetByIdentifierAsync",
-                "FindByIdentifierAsync"
-            },
-            new object?[] { key },
-            ct
-        ).ConfigureAwait(false);
-
+        // Recherche : d'abord login, puis email
+        User? user = await _userRepository.GetByLoginAsync(key, ct).ConfigureAwait(false);
         if (user is null)
         {
-            // fallback : GetByLoginAsync puis GetByEmailAsync
-            user = await RepoInvoke.CallFirstAsync<dynamic>(
-                _userRepository,
-                new[] { "GetByLoginAsync", "FindByLoginAsync" },
-                new object?[] { key },
-                ct
-            ).ConfigureAwait(false);
-
-            user ??= await RepoInvoke.CallFirstAsync<dynamic>(
-                _userRepository,
-                new[] { "GetByEmailAsync", "FindByEmailAsync" },
-                new object?[] { key },
-                ct
-            ).ConfigureAwait(false);
+            user = await _userRepository.GetByEmailAsync(key, ct).ConfigureAwait(false);
         }
-
         if (user is null)
-            return new AuthServiceValidateCredentialsResult<dynamic>(false, null);
+            return new AuthServiceValidateCredentialsResult<User?>(false, null);
 
-        // 2) Verrouillage compte
-        if (TryGetLockedUntilUtc(user, out DateTimeOffset? lockedUntilUtc) && lockedUntilUtc is not null && lockedUntilUtc > DateTimeOffset.UtcNow)
-            throw new AuthExceptionUserLocked(lockedUntilUtc);
+        // TODO: contrôle du verrouillage lorsqu'un champ LockedUntilUtc sera disponible sur User
 
-        // 3) Hash stocké + vérification
-        var storedHash = GetStringProperty(user, new[] { "PasswordHash", "PasswordHashHex", "PasswordHashValue" });
-        var storedSalt = GetStringProperty(user, new[] { "PasswordSalt", "Salt", "PasswordSaltBase64" });
-        var iterations = GetIntProperty(user, new[] { "PasswordIterations", "Iterations" });
-
+        // Vérification du mot de passe. Le domaine expose uniquement PasswordHash
+        // (formate PBKDF2 ou SHA256). Le helper ci-dessous supporte plusieurs formats.
+        var storedHash = user.PasswordHash;
         if (string.IsNullOrWhiteSpace(storedHash))
-            return new AuthServiceValidateCredentialsResult<dynamic>(false, null);
+            return new AuthServiceValidateCredentialsResult<User?>(false, null);
 
-        var ok = VerifyPassword(password, storedHash!, storedSalt, iterations);
+        bool ok = VerifyPassword(password, storedHash, null, null);
         if (!ok)
-            return new AuthServiceValidateCredentialsResult<dynamic>(false, null);
+            return new AuthServiceValidateCredentialsResult<User?>(false, null);
 
-        return new AuthServiceValidateCredentialsResult<dynamic>(true, user);
+        return new AuthServiceValidateCredentialsResult<User?>(true, user);
     }
 
     /// <summary>
-    /// Variante stricte : lève <see cref="AuthExceptionInvalidCredentials"/> si invalides.
+    /// Variante stricte : lève <see cref="AuthExceptionInvalidCredentials"/>
+    /// si les identifiants sont invalides.
     /// </summary>
-    public async Task<dynamic> ValidateOrThrowAsync(
+    public async Task<User> ValidateOrThrowAsync(
         string loginOrEmail,
         string password,
         CancellationToken ct = default)
@@ -113,42 +91,6 @@ public sealed class AuthServiceValidateCredentials
     private static string NormalizeLoginOrEmail(string input)
         => input.Trim().ToLowerInvariant();
 
-    private static bool TryGetLockedUntilUtc(dynamic user, out DateTimeOffset? lockedUntilUtc)
-    {
-        lockedUntilUtc = null;
-        if (user is null) return false;
-
-        // common property names
-        DateTimeOffset? dto;
-        if (RepoInvoke.TryGetProperty<DateTimeOffset?>(user, new[] { "LockedUntilUtc", "LockoutEndUtc" }, out dto))
-        {
-            lockedUntilUtc = dto;
-            return true;
-        }
-
-        // Sometimes stored as DateTime
-        DateTime? dt;
-        if (RepoInvoke.TryGetProperty<DateTime?>(user, new[] { "LockedUntilUtc", "LockoutEndUtc" }, out dt) && dt.HasValue)
-        {
-            lockedUntilUtc = new DateTimeOffset(DateTime.SpecifyKind(dt!.Value, DateTimeKind.Utc));
-            return true;
-        }
-
-        return false;
-    }
-
-    private static string? GetStringProperty(dynamic obj, IEnumerable<string> names)
-    {
-        string? v;
-        return RepoInvoke.TryGetProperty<string>(obj, names, out v) ? v : null;
-    }
-
-    private static int? GetIntProperty(dynamic obj, IEnumerable<string> names)
-    {
-        int v;
-        return RepoInvoke.TryGetProperty<int>(obj, names, out v) ? v : (int?)null;
-    }
-
     /// <summary>
     /// Supporte :
     /// - PBKDF2 : "PBKDF2$&lt;iterations&gt;$&lt;saltB64&gt;$&lt;hashB64&gt;"
@@ -157,21 +99,19 @@ public sealed class AuthServiceValidateCredentials
     /// </summary>
     private static bool VerifyPassword(string password, string storedHash, string? storedSalt, int? storedIterations)
     {
-        // Format 1 : PBKDF2$iter$salt$hash
+        // Format 1 : PBKDF2$100000$saltB64$hashB64
         if (TryParsePbkdf2Dollar(storedHash, out var it1, out var salt1, out var hash1))
         {
             var computed = Pbkdf2(password, salt1, it1, hash1.Length);
             return FixedTimeEquals(hash1, computed);
         }
-
         // Format 2 : iter.salt.hash
         if (TryParsePbkdf2Dot(storedHash, out var it2, out var salt2, out var hash2))
         {
             var computed = Pbkdf2(password, salt2, it2, hash2.Length);
             return FixedTimeEquals(hash2, computed);
         }
-
-        // Format 3 : salt + hash (separate fields) if available
+        // Format 3 : champs séparés (salt + hash + iterations)
         if (!string.IsNullOrWhiteSpace(storedSalt) && storedIterations is not null)
         {
             if (TryFromBase64(storedSalt!, out var saltB))
@@ -189,7 +129,6 @@ public sealed class AuthServiceValidateCredentials
                 }
             }
         }
-
         // Fallback : SHA256 hex
         var computedHex = ComputeSha256Hex(password);
         return SlowEqualsHex(computedHex, storedHash);
@@ -208,8 +147,6 @@ public sealed class AuthServiceValidateCredentials
         iterations = 0;
         salt = Array.Empty<byte>();
         hash = Array.Empty<byte>();
-
-        // PBKDF2$100000$saltB64$hashB64
         var parts = s.Split('$', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         if (parts.Length != 4) return false;
         if (!parts[0].Equals("PBKDF2", StringComparison.OrdinalIgnoreCase)) return false;
@@ -224,7 +161,6 @@ public sealed class AuthServiceValidateCredentials
         iterations = 0;
         salt = Array.Empty<byte>();
         hash = Array.Empty<byte>();
-
         var parts = s.Split('.', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         if (parts.Length != 3) return false;
         if (!int.TryParse(parts[0], out iterations)) return false;
@@ -264,16 +200,13 @@ public sealed class AuthServiceValidateCredentials
     private static string ComputeSha256Hex(string input)
     {
         var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(input));
-        return Convert.ToHexString(bytes); // uppercase
+        return Convert.ToHexString(bytes);
     }
 
     private static bool SlowEqualsHex(string a, string b)
     {
-        // Normalize hex strings (ignore case + whitespace)
         a = a.Trim();
         b = b.Trim();
-
-        // If b is not hex, compare as UTF8
         var ba = Encoding.UTF8.GetBytes(a.ToUpperInvariant());
         var bb = Encoding.UTF8.GetBytes(b.ToUpperInvariant());
         return CryptographicOperations.FixedTimeEquals(ba, bb);

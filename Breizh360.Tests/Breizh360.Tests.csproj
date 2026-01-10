@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
+    <PackageReference Include="xunit" Version="2.5.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Breizh360.Domaine/Breizh360.Domaine.csproj" />
+    <ProjectReference Include="../Breizh360.Metier/Breizh360.Metier.csproj" />
+    <ProjectReference Include="../Breizh360.Api/Breizh360.Api.csproj" />
+    <ProjectReference Include="../Breizh360.Data/Breizh360.Data.csproj" />
+  </ItemGroup>
+
+</Project>

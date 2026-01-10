@@ -1,13 +1,18 @@
-  <Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
-    <PropertyGroup>
-      <TargetFramework>net10.0</TargetFramework>
-      <ImplicitUsings>enable</ImplicitUsings>
-      <Nullable>enable</Nullable>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
 
-<ItemGroup>
-  <PackageReference Include="Yarp.ReverseProxy" Version="*" />
-  <PackageReference Include="Serilog.AspNetCore" Version="*" />
-</ItemGroup>
-  </Project>
+  <!--
+    Versions explicites pour YARP et Serilog afin d’éviter les mises à jour
+    inattendues. Voir recommandations dans l’audit.
+  -->
+  <ItemGroup>
+    <PackageReference Include="Yarp.ReverseProxy" Version="1.1.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
+  </ItemGroup>
+
+</Project>
