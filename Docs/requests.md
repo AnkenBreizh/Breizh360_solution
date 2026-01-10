@@ -191,7 +191,7 @@
 - **À :** Données
 - **Owner :** Données
 - **Priorité :** P1
-- **Statut :** Ready
+- **Statut :** Done
 - **Nécessaire pour :** `INIT-NOTIF-001` / `NOTIF`
 - **Date cible :** 2026-01-15
 - **Détails :**
@@ -201,10 +201,15 @@
 - **Critères d’acceptation :**
   - Contrat publié dans `Breizh360.Data/interfaces.md` (`IF-DATA-NOTIF-001`)
   - Migration reproductible (`dotnet ef migrations script` / apply)
-- **Remise attendue :**
+- **Remise :**
   - `/Breizh360.Data/interfaces.md` (IF-DATA-NOTIF-001)
-  - `/Breizh360.Data/Notifications/...`
-  - `/Breizh360.Data/Migrations/...`
+  - `/Breizh360.Data/Breizh360DbContext.cs` (DbSet Notifications)
+  - `/Breizh360.Data/DependencyInjection/Breizh360DataServiceCollectionExtensions.cs` (DI : `INotificationRepository`)
+  - `/Breizh360.Data/Notifications/Configurations/NotificationEfConfiguration.cs`
+  - `/Breizh360.Data/Notifications/Repositories/NotificationRepository.cs`
+  - `/Breizh360.Data/Migrations/Notifications/20260110110000_NotifInboxInitial.cs`
+  - `/Breizh360.Data/Migrations/Notifications/20260110110000_NotifInboxInitial.Designer.cs`
+  - `/Breizh360.Data/Migrations/Auth/Breizh360DbContextModelSnapshot.cs` (snapshot)
 
 ### `NOTIF-REQ-005` — Endpoints Inbox + unread count (REST) + intégration hub (ack/read)
 - **De :** UI

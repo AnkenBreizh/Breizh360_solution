@@ -1,7 +1,7 @@
 # Interfaces — Couche Données (Breizh360.Data)
 
-> **Dernière mise à jour :** 2026-01-09  
-> **Version des contrats :** 0.1.0 (Stable)  
+> **Dernière mise à jour :** 2026-01-10  
+> **Version des contrats :** 0.2.0 (Stable)  
 > **Responsable :** Équipe Données  
 > **Règle de changement :** breaking change ⇒ nouvelle version majeure + REQ + note de migration
 
@@ -119,7 +119,7 @@ Garantir la disponibilité des implémentations EF Core des interfaces de reposi
 
 ---
 
-## IF-DATA-NOTIF-001 — Persistance Inbox Notifications (Draft)
+## IF-DATA-NOTIF-001 — Persistance Inbox Notifications
 
 **But**
 
@@ -133,6 +133,27 @@ Persister l’inbox des notifications (historique + read/unread + indexation) co
 - Migrations EF Core reproductibles
 - Implémentation repository EF (conforme au contrat du domaine)
 
-**Remise attendue**
-- `Breizh360.Data/Notifications/...` (entities EF/configurations/repositories)
-- `Breizh360.Data/Migrations/...`
+**Source de vérité**
+
+- `Breizh360.Data/Notifications/Configurations/NotificationEfConfiguration.cs`
+- `Breizh360.Data/Notifications/Repositories/NotificationRepository.cs`
+- `Breizh360.Data/Migrations/Notifications/20260110110000_NotifInboxInitial.cs`
+- `Breizh360.Data/Migrations/Auth/Breizh360DbContextModelSnapshot.cs` (snapshot DbContext)
+
+**Schéma attendu (résumé)**
+
+- Table : `notif_inbox_notifications`
+- Clé primaire : `Id`
+- Index (performance) :
+  - `(UserId, CreatedAtUtc)` — liste inbox
+  - `(UserId, IsRead)` — unread count
+  - `(Status, NextAttemptAtUtc)` — traitement “pending due”
+- Anti-doublon : index unique `(UserId, IdempotencyKey)` (clé nullable)
+
+**Critères d’acceptation**
+
+- Les opérations du contrat domaine `INotificationRepository` sont supportées :
+  - lecture par Id
+  - lot “pending due” (Pending + `NextAttemptAtUtc <= now`)
+  - existence par (UserId, IdempotencyKey)
+- Les migrations peuvent être appliquées de façon reproductible (table + index créés).

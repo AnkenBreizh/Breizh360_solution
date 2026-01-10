@@ -20,6 +20,14 @@ La partie Auth est structurée autour de :
 - `Auth/Seed` : seed *Dev* (jeu de données de départ)
 - `Migrations/Auth` : migration initiale + snapshot du modèle Auth
 
+### Notifications (Inbox persistée)
+
+La persistance de l’inbox (historique de notifications, read/unread, retry, idempotence) est structurée autour de :
+
+- `Notifications/Configurations` : mapping EF de `Notification`
+- `Notifications/Repositories` : implémentation EF de `INotificationRepository`
+- `Migrations/Notifications` : migration initiale Inbox Notifications
+
 ## Structure du projet (repères)
 
 - `Breizh360DbContext.cs` : point d’entrée EF (DbSets + configuration)

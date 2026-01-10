@@ -4,6 +4,7 @@ using Breizh360.Domaine.Auth.Permissions;
 using Breizh360.Domaine.Auth.RefreshTokens;
 using Breizh360.Domaine.Auth.Roles;
 using Breizh360.Domaine.Auth.Users;
+using Breizh360.Domaine.Notifications.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Breizh360.Data;
@@ -19,6 +20,9 @@ public sealed class Breizh360DbContext : DbContext
     public DbSet<UserRole> UserRoles => Set<UserRole>();
     public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+
+    // Notifications (Inbox persistée)
+    public DbSet<Notification> Notifications => Set<Notification>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

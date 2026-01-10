@@ -4,10 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Breizh360.Data.Auth.Repositories;
+using Breizh360.Data.Notifications.Repositories;
 using Breizh360.Domaine.Auth.Users;
 using Breizh360.Domaine.Auth.Roles;
 using Breizh360.Domaine.Auth.Permissions;
 using Breizh360.Domaine.Auth.RefreshTokens;
+using Breizh360.Domaine.Notifications.Repositories;
 
 namespace Breizh360.Data;
 
@@ -53,6 +55,9 @@ public static class Breizh360DataServiceCollectionExtensions
         services.AddScoped<IRoleRepository, RoleRepository>();
         services.AddScoped<IPermissionRepository, PermissionRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+
+        // Notifications (Inbox persistée)
+        services.AddScoped<INotificationRepository, NotificationRepository>();
 
         return services;
     }

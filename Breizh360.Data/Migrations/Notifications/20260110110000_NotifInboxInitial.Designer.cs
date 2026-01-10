@@ -10,16 +10,18 @@ using Breizh360.Domaine.Notifications.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Breizh360.Data.Migrations.Auth;
+namespace Breizh360.Data.Migrations.Notifications;
 
 [DbContext(typeof(Breizh360DbContext))]
-public partial class Breizh360DbContextModelSnapshot : ModelSnapshot
+[Migration("20260110110000_NotifInboxInitial")]
+public partial class NotifInboxInitial
 {
-    protected override void BuildModel(ModelBuilder modelBuilder)
+    protected override void BuildTargetModel(ModelBuilder modelBuilder)
     {
         modelBuilder
             .HasAnnotation("ProductVersion", "10.0.1")
@@ -115,6 +117,7 @@ public partial class Breizh360DbContextModelSnapshot : ModelSnapshot
             b.HasIndex("UserId");
             b.ToTable("auth_refresh_tokens");
         });
+
         // Notifications (Inbox)
         var notificationIdConverter = new ValueConverter<NotificationId, Guid>(
             v => v.Value,
@@ -162,10 +165,12 @@ public partial class Breizh360DbContextModelSnapshot : ModelSnapshot
                 .HasConversion(idempotencyKeyConverter);
 
             b.HasKey("Id");
+
             b.HasIndex("UserId", "CreatedAtUtc");
             b.HasIndex("UserId", "IsRead");
             b.HasIndex("Status", "NextAttemptAtUtc");
             b.HasIndex("UserId", "IdempotencyKey").IsUnique();
+
             b.ToTable("notif_inbox_notifications");
         });
 
