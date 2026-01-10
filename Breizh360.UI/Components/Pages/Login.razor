@@ -1,0 +1,98 @@
+@page "/"
+@page "/login"
+
+@using System.ComponentModel.DataAnnotations
+
+<h1 class="sr-only">Connexion</h1>
+
+<div class="login-root">
+    <section class="login-card" aria-label="Connexion Breizh360">
+        <header class="login-brand">
+            <div class="login-mark" aria-hidden="true">B</div>
+            <div>
+                <div class="login-app">Breizh360</div>
+                <div class="login-subtitle">Connexion</div>
+            </div>
+        </header>
+
+        <EditForm Model="_model" OnValidSubmit="HandleLoginAsync">
+            <DataAnnotationsValidator />
+
+            <div class="field">
+                <label for="email">Email</label>
+                <InputText id="email" class="text-input" @bind-Value="_model.Email" placeholder="prenom.nom@domaine.fr" inputmode="email" autocomplete="username" />
+                <ValidationMessage For="() => _model.Email" />
+            </div>
+
+            <div class="field">
+                <label for="password">Mot de passe</label>
+                <InputText id="password" class="text-input" @bind-Value="_model.Password" type="password" placeholder="••••••••" autocomplete="current-password" />
+                <ValidationMessage For="() => _model.Password" />
+            </div>
+
+            <div class="row">
+                <label class="check">
+                    <InputCheckbox class="check-input" @bind-Value="_model.RememberMe" />
+                    <span>Se souvenir de moi</span>
+                </label>
+
+                <a class="link" href="/login" @onclick:preventDefault="true" title="À implémenter">Mot de passe oublié</a>
+            </div>
+
+            <button class="primary" type="submit" disabled="@_isSubmitting">
+                @(_isSubmitting ? "Connexion…" : "Se connecter")
+            </button>
+
+            <div class="hint">
+                Cette page UI est prête. Le branchement à l’API dépend du contrat <strong>AUTH</strong>.
+            </div>
+        </EditForm>
+
+        @if (!string.IsNullOrWhiteSpace(_status))
+        {
+            <div class="status" role="status">@_status</div>
+        }
+
+        <footer class="login-footer">
+            <a class="link" href="/home">Accéder à l’accueil (placeholder)</a>
+            <span class="sep" aria-hidden="true">•</span>
+            <span class="muted">MVP UI</span>
+        </footer>
+    </section>
+</div>
+
+@code {
+    private readonly LoginModel _model = new();
+    private bool _isSubmitting;
+    private string? _status;
+
+    private async Task HandleLoginAsync()
+    {
+        _isSubmitting = true;
+        _status = null;
+
+        try
+        {
+            // Stub volontaire : l’intégration réelle dépend du contrat API AUTH.
+            await Task.Delay(250);
+            _status = "Connexion non branchée (contrat API AUTH à publier/figer).";
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
+    }
+
+    private sealed class LoginModel
+    {
+        [Required(ErrorMessage = "Email requis.")]
+        [EmailAddress(ErrorMessage = "Email invalide.")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Mot de passe requis.")]
+        [MinLength(6, ErrorMessage = "6 caractères minimum.")]
+        public string Password { get; set; } = string.Empty;
+
+        public bool RememberMe { get; set; } = true;
+    }
+}

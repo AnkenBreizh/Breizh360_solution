@@ -1,6 +1,6 @@
 # Interface utilisateur — Breizh360.UI
 
-> **Dernière mise à jour :** 2026-01-09  
+> **Dernière mise à jour :** 2026-01-10  
 > **Owner :** Équipe UI  
 > **Stack :** .NET MAUI + BlazorWebView (Razor Components)
 
@@ -30,6 +30,7 @@ Fournir l’application cliente (mobile/desktop) de Breizh360.
 
 ## Architecture (conventions)
 - **Pages Razor** dans `Components/Pages/`.
+- **Page de démarrage :** `Login` (`/` et `/login`).
 - **Feature folders** (à créer quand Ready) :
   - `Users/` (écrans + services + modèles)
   - `Notifications/` (SignalR + UI d’affichage)

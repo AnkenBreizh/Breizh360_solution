@@ -39,6 +39,39 @@
 
 ---
 
+## Demandes — AUTH (Authentification)
+
+### `AUTH-REQ-001` — Contrat API Auth (login + refresh + logout + /me)
+- **De :** UI
+- **À :** API
+- **Owner :** API
+- **Priorité :** P1
+- **Statut :** Ready
+- **Nécessaire pour :** `INIT-AUTH-001` / `AUTH` (+ déblocage `AUTH-UI-002`)
+- **Date cible :** 2026-01-12
+- **Détails :**
+  - Documenter clairement les routes (cibles) :
+    - `POST /auth/login` (ou équivalent) : email/login + password
+    - `POST /auth/refresh` : renouvellement JWT (si supporté)
+    - `POST /auth/logout` (si supporté)
+    - `GET /me` : identité courante + rôles/claims utiles
+  - DTO request/response : schémas JSON stables + exemples.
+  - Stratégie tokens : access token + refresh (si applicable), durées, storage attendu côté client.
+  - Format d’erreur standard : codes/structures pour 400/401/403/429/500.
+  - Contraintes SignalR : rappel de la façon de passer le token (querystring `access_token` si nécessaire).
+- **Critères d’acceptation :**
+  - Contrat publié dans `Breizh360.Api/interfaces.md` : `IF-API-AUTH-001` (+ `IF-API-ME-001` si séparé)
+  - Les DTO existent et sont référencés (dossier `Breizh360.Api/Contracts/Auth/*` et `Contracts/Me/*` si besoin)
+  - UI peut implémenter l’auth sans ambiguïté (flux + erreurs)
+- **Remise attendue :**
+  - `/Breizh360.Api/interfaces.md` (ajout/MAJ sections AUTH)
+  - `/Breizh360.Api/Controllers/AuthController.cs`
+  - `/Breizh360.Api/Controllers/MeController.cs`
+  - `/Breizh360.Api/Contracts/Auth/*`
+  - `/Breizh360.Api/Contracts/Me/*`
+- **Historique :**
+  - 2026-01-10 : création (besoin UI : branchement Login)
+
 ## Demandes — USR (Users)
 
 ### `USR-REQ-001` — Contrat Domaine Users (entités + repos)
