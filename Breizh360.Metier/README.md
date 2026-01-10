@@ -1,6 +1,6 @@
 # Breizh360.Metier — Couche Métier (use-cases)
 
-> **Dernière mise à jour :** 2026-01-09  
+> **Dernière mise à jour :** 2026-01-10  
 > **Rôle :** Équipe Métier  
 > **Règles :** ID stable, statuts standard, **Done = Remise**, contrats avant implémentation.
 
@@ -18,10 +18,15 @@ Ce module porte la **logique applicative** (use-cases) et sert d’interface ent
 ## Périmètre
 
 ### AUTH (présent dans ce projet)
-Services applicatifs de base pour :
+Services applicatifs pour :
 - validation d’identifiants
 - émission / rotation de tokens (JWT + refresh token)
 - vérification d’autorisations (permissions)
+
+**Dépendances typées (pas de reflection)** :
+- `IAuthUserRepository` (credentials)
+- `IRefreshTokenRepository` (refresh tokens hashés + rotation)
+- `IPermissionRepository` (RBAC/permissions)
 
 📌 Détails JWT : `Auth/02_contrat_jwt.md`
 

@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Breizh360.Domaine.Auth.RefreshTokens;
 using Breizh360.Metier.Common;
 using Microsoft.IdentityModel.Tokens;
 
@@ -8,22 +9,44 @@ namespace Breizh360.Metier.Auth;
 
 /// <summary>
 /// AUTH-BIZ-002 — Émission JWT + refresh token (hashé + rotation).
+///
+/// Notes d'intégration :
+/// - La persistance est faite via <see cref="IRefreshTokenRepository"/>.
+/// - Le commit (SaveChanges/UoW) est à la charge de la couche appelante (API).
 /// </summary>
 public sealed class TokenService
 {
     private readonly AuthOptionsJwt _jwt;
     private readonly IClock _clock;
-    private readonly object? _refreshTokenRepository;
+    private readonly IRefreshTokenRepository? _refreshTokenRepository;
 
+    /// <summary>
+    /// Constructeur principal (signature historique). Le dépôt est attendu sous forme de
+    /// <see cref="IRefreshTokenRepository"/> (le paramètre <c>object</c> est conservé pour
+    /// compatibilité avec l'existant).
+    /// </summary>
     public TokenService(AuthOptionsJwt jwt, IClock? clock = null, object? refreshTokenRepository = null)
     {
         _jwt = jwt ?? throw new ArgumentNullException(nameof(jwt));
         _clock = clock ?? new SystemClock();
-        _refreshTokenRepository = refreshTokenRepository;
+        _refreshTokenRepository = refreshTokenRepository as IRefreshTokenRepository
+            ?? (refreshTokenRepository is null
+                ? null
+                : throw new ArgumentException(
+                    "Le refreshTokenRepository doit implémenter IRefreshTokenRepository (Breizh360.Domaine.Auth.RefreshTokens).",
+                    nameof(refreshTokenRepository)));
     }
 
     /// <summary>
-    /// Émet une paire (access + refresh). Le refresh token est stocké côté DB uniquement sous forme de hash.
+    /// Overload typé (facilite l'injection DI).
+    /// </summary>
+    public TokenService(AuthOptionsJwt jwt, IRefreshTokenRepository refreshTokenRepository, IClock? clock = null)
+        : this(jwt, clock, refreshTokenRepository)
+    {
+    }
+
+    /// <summary>
+    /// Émet une paire (access + refresh). Le refresh token n'est jamais stocké en clair.
     /// </summary>
     public async Task<TokenPair> IssueAsync(
         Guid userId,
@@ -38,32 +61,17 @@ public sealed class TokenService
         var accessExp = now.AddMinutes(_jwt.AccessTokenMinutes);
         var refreshExp = now.AddDays(_jwt.RefreshTokenDays);
 
-        var accessToken = CreateAccessToken(userId, login, roles, permissions, now, accessExp);
-
-        // Refresh token opaque (jamais stocké en clair)
-        var refreshToken = RefreshTokenCrypto.GenerateOpaqueToken();
-        var refreshTokenHash = RefreshTokenCrypto.HashToken(refreshToken, _jwt.SigningKey);
+        var issue = BuildIssue(userId, login, roles, permissions, now, accessExp, refreshExp);
 
         if (_refreshTokenRepository is not null)
         {
-            await StoreRefreshTokenAsync(
-                _refreshTokenRepository,
-                userId,
-                refreshTokenHash,
-                now,
-                refreshExp,
-                ct
-            ).ConfigureAwait(false);
+            // Persist uniquement le hash + métadonnées
+            issue.RefreshTokenEntity.MarkCreated(actorId: userId, now: now);
+            await _refreshTokenRepository.AddAsync(issue.RefreshTokenEntity, ct).ConfigureAwait(false);
         }
 
-        return new TokenPair(
-            AccessToken: accessToken,
-            RefreshToken: refreshToken,
-            AccessTokenExpiresAtUtc: accessExp,
-            RefreshTokenExpiresAtUtc: refreshExp
-        );
+        return issue.Pair;
     }
-
 
     /// <summary>
     /// Rafraîchit une paire (access + refresh) en validant le refresh token fourni puis en effectuant une rotation.
@@ -78,90 +86,79 @@ public sealed class TokenService
     {
         ValidateJwtOptions(_jwt);
 
+        if (userId == Guid.Empty)
+            throw new ArgumentException("UserId invalide.", nameof(userId));
         if (string.IsNullOrWhiteSpace(refreshToken))
             throw new ArgumentException("Le refresh token est requis.", nameof(refreshToken));
 
         if (_refreshTokenRepository is null)
             throw new InvalidOperationException(
                 "Le refresh token repository est requis pour effectuer un refresh (rotation). " +
-                "Passez une implémentation via le constructeur TokenService(..., refreshTokenRepository: ...).");
+                "Passez une implémentation via le constructeur TokenService(..., refreshTokenRepository: ...)."
+            );
 
         var now = _clock.UtcNow;
         var presentedHash = RefreshTokenCrypto.HashToken(refreshToken, _jwt.SigningKey);
 
-        // Validation/consommation best-effort : on tente de supporter plusieurs signatures possibles.
-        var isValid = await ValidateAndOptionallyConsumeRefreshTokenAsync(
-            _refreshTokenRepository,
-            userId,
-            presentedHash,
-            now,
-            ct
-        ).ConfigureAwait(false);
+        var current = await _refreshTokenRepository.GetByTokenHashAsync(presentedHash, ct).ConfigureAwait(false);
+        if (current is null)
+            throw new SecurityTokenException("Refresh token invalide.");
 
-        if (!isValid)
-            throw new SecurityTokenException("Refresh token invalide ou expiré.");
+        if (current.UserId != userId)
+            throw new SecurityTokenException("Refresh token invalide.");
 
-        // Rotation : émet une nouvelle paire + stocke le nouveau refresh hashé via StoreRefreshTokenAsync
-        return await IssueAsync(
-            userId,
-            roles,
-            permissions,
-            login,
-            ct
-        ).ConfigureAwait(false);
+        // Validation côté service (évite de dépendre d'une propriété calculée basée sur DateTimeOffset.UtcNow)
+        if (current.IsDeleted || current.RevokedAt is not null || current.ExpiresAt <= now)
+            throw new SecurityTokenException("Refresh token expiré ou révoqué.");
+
+        // Nouvelle paire (rotation)
+        var accessExp = now.AddMinutes(_jwt.AccessTokenMinutes);
+        var refreshExp = now.AddDays(_jwt.RefreshTokenDays);
+        var issue = BuildIssue(userId, login, roles, permissions, now, accessExp, refreshExp);
+
+        // Lier + révoquer l'ancien token
+        current.ReplaceBy(issue.RefreshTokenEntity.Id, actorId: userId, now: now);
+        current.Revoke(actorId: userId, reason: "rotated", now: now);
+
+        await _refreshTokenRepository.UpdateAsync(current, ct).ConfigureAwait(false);
+
+        issue.RefreshTokenEntity.MarkCreated(actorId: userId, now: now);
+        await _refreshTokenRepository.AddAsync(issue.RefreshTokenEntity, ct).ConfigureAwait(false);
+
+        return issue.Pair;
     }
 
-    private static async Task<bool> ValidateAndOptionallyConsumeRefreshTokenAsync(
-        object refreshTokenRepository,
+    // -----------------------
+    // Internals
+    // -----------------------
+
+    private sealed record IssueResult(TokenPair Pair, RefreshToken RefreshTokenEntity);
+
+    private IssueResult BuildIssue(
         Guid userId,
-        string tokenHash,
-        DateTimeOffset nowUtc,
-        CancellationToken ct)
+        string? login,
+        IEnumerable<string>? roles,
+        IEnumerable<string>? permissions,
+        DateTimeOffset now,
+        DateTimeOffset accessExp,
+        DateTimeOffset refreshExp)
     {
-        // Méthodes courantes de validation (retour bool)
-        var validateNames = new[]
-        {
-            "ConsumeAsync",            // idéal : valide + révoque l'ancien token (one-time use)
-            "ValidateAsync",
-            "IsValidAsync",
-            "ExistsAsync",
-            "CheckAsync",
-            "CanRefreshAsync"
-        };
+        var accessToken = CreateAccessToken(userId, login, roles, permissions, now, accessExp);
 
-        var argCandidates = new List<object?[]>
-        {
-            // (userId, tokenHash)
-            new object?[] { userId, tokenHash },
-            // (userId, tokenHash, nowUtc)
-            new object?[] { userId, tokenHash, nowUtc },
-            // (tokenHash)
-            new object?[] { tokenHash },
-            // (tokenHash, nowUtc)
-            new object?[] { tokenHash, nowUtc }
-        };
+        // Refresh token opaque (jamais stocké en clair)
+        var refreshToken = RefreshTokenCrypto.GenerateOpaqueToken();
+        var refreshTokenHash = RefreshTokenCrypto.HashToken(refreshToken, _jwt.SigningKey);
 
-        foreach (var args in argCandidates)
-        {
-            foreach (var name in validateNames)
-            {
-                var (found, result) = await RepoInvoke.TryCallAsync<bool>(
-                    refreshTokenRepository,
-                    name,
-                    args,
-                    ct
-                ).ConfigureAwait(false);
+        var entity = new RefreshToken(userId, refreshTokenHash, refreshExp);
 
-                if (found)
-                    return result;
-            }
-        }
+        var pair = new TokenPair(
+            AccessToken: accessToken,
+            RefreshToken: refreshToken,
+            AccessTokenExpiresAtUtc: accessExp,
+            RefreshTokenExpiresAtUtc: refreshExp
+        );
 
-        // Si aucune méthode bool n'existe, on ne peut pas garantir la validation côté service.
-        throw new InvalidOperationException(
-            "Aucune méthode compatible trouvée pour valider/consommer le refresh token. " +
-            "Attendu : Consume/Validate/IsValid/Exists/Check/CanRefreshAsync(userId, tokenHash[, nowUtc][, ct]) " +
-            "ou Consume/Validate/IsValid/Exists/Check/CanRefreshAsync(tokenHash[, nowUtc][, ct]).");
+        return new IssueResult(pair, entity);
     }
 
     private string CreateAccessToken(
@@ -223,56 +220,5 @@ public sealed class TokenService
             throw new InvalidOperationException("AuthOptionsJwt.AccessTokenMinutes doit être > 0.");
         if (jwt.RefreshTokenDays <= 0)
             throw new InvalidOperationException("AuthOptionsJwt.RefreshTokenDays doit être > 0.");
-    }
-
-    private static async Task StoreRefreshTokenAsync(
-        object refreshTokenRepository,
-        Guid userId,
-        string tokenHash,
-        DateTimeOffset createdAtUtc,
-        DateTimeOffset expiresAtUtc,
-        CancellationToken ct)
-    {
-        // Best effort : supporter plusieurs signatures possibles (primitives).
-        var methodNames = new[]
-        {
-            "CreateAsync",
-            "AddAsync",
-            "InsertAsync",
-            "StoreAsync",
-            "UpsertAsync",
-            "SaveAsync"
-        };
-
-        var argCandidates = new List<object?[]>
-        {
-            // (userId, tokenHash, expiresAtUtc)
-            new object?[] { userId, tokenHash, expiresAtUtc },
-            // (userId, tokenHash, createdAtUtc, expiresAtUtc)
-            new object?[] { userId, tokenHash, createdAtUtc, expiresAtUtc }
-        };
-
-        foreach (var args in argCandidates)
-        {
-            foreach (var name in methodNames)
-            {
-                var (found, _) = await RepoInvoke.TryCallAsync<object?>(
-                    refreshTokenRepository,
-                    name,
-                    args,
-                    ct
-                ).ConfigureAwait(false);
-
-                if (found)
-                    return;
-            }
-        }
-
-        // En dernier recours : une méthode qui prend un "record/entity" n'est pas invocable ici
-        // sans référence compile-time. On force donc un message explicite.
-        throw new InvalidOperationException(
-            "Aucune méthode compatible trouvée pour stocker le refresh token. " +
-            "Attendu : Create/Add/Insert/Store/Upsert/SaveAsync(userId, tokenHash, expiresAtUtc[, ct]) " +
-            "ou Create/Add/Insert/Store/Upsert/SaveAsync(userId, tokenHash, createdAtUtc, expiresAtUtc[, ct]).");
     }
 }

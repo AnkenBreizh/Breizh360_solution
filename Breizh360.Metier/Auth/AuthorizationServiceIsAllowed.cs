@@ -1,23 +1,46 @@
+using Breizh360.Domaine.Auth.Permissions;
+using Breizh360.Domaine.Common;
+
 namespace Breizh360.Metier.Auth;
 
 /// <summary>
 /// AUTH-BIZ-003 — RBAC + (optionnel) ABAC.
+///
+/// Règle de collaboration : pas de dynamic / reflection.
+/// Dépendance attendue : <see cref="IPermissionRepository"/>.
 /// </summary>
 public sealed class AuthorizationServiceIsAllowed
 {
-    private readonly object _authorizationRepository;
+    private readonly IPermissionRepository _permissionRepository;
 
-    public AuthorizationServiceIsAllowed(object authorizationRepository)
+    /// <summary>
+    /// Constructeur typé (recommandé).
+    /// </summary>
+    public AuthorizationServiceIsAllowed(IPermissionRepository permissionRepository)
     {
-        _authorizationRepository = authorizationRepository ?? throw new ArgumentNullException(nameof(authorizationRepository));
+        _permissionRepository = permissionRepository ?? throw new ArgumentNullException(nameof(permissionRepository));
     }
 
     /// <summary>
-    /// Vérifie si <paramref name="userId"/> est autorisé pour la permission.
+    /// Constructeur legacy pour compatibilité.
+    /// Si l'objet ne peut pas être casté en <see cref="IPermissionRepository"/>, une exception est levée.
+    /// </summary>
+    [Obsolete("Utiliser AuthorizationServiceIsAllowed(IPermissionRepository). Le constructeur object est conservé pour compatibilité.")]
+    public AuthorizationServiceIsAllowed(object permissionRepository)
+        : this(permissionRepository as IPermissionRepository
+               ?? throw new ArgumentException(
+                   "Le repository doit implémenter IPermissionRepository (Breizh360.Domaine.Auth.Permissions).",
+                   nameof(permissionRepository)))
+    {
+    }
+
+    /// <summary>
+    /// Vérifie si <paramref name="userId"/> est autorisé pour une permission (code stable).
+    ///
     /// Stratégie :
-    /// 1) si le dépôt expose IsAllowedAsync/HasPermissionAsync, on délègue
-    /// 2) sinon, on récupère la liste des permissions et on fait la vérif ici
-    /// 3) ABAC minimal : *:own => ownership
+    /// - ABAC minimal : ":own" => ownership
+    /// - RBAC : compare la permission demandée avec la liste effective côté Domaine (permissions via rôles)
+    /// - Support simple des wildcards suffixes (ex: "admin.*")
     /// </summary>
     public async Task<bool> IsAllowedAsync(
         Guid userId,
@@ -32,39 +55,26 @@ public sealed class AuthorizationServiceIsAllowed
         if (!PassesAbac(userId, permission, ctx))
             return false;
 
-        // 1) délégation directe
-        var direct = await RepoInvoke.CallFirstAsync<bool?>(
-            _authorizationRepository,
-            new[]
-            {
-                "IsAllowedAsync",
-                "HasPermissionAsync",
-                "CheckAsync"
-            },
-            new object?[] { userId, permission, ctx },
-            ct
-        ).ConfigureAwait(false);
+        // Normalisation identique à celle du Domaine (trim + lower).
+        var required = Normalization.NormalizeIdentityKey(permission);
 
-        if (direct is not null)
-            return direct.Value;
-
-        // 2) liste des permissions
-        var perms = await RepoInvoke.CallFirstAsync<IEnumerable<string>>(
-            _authorizationRepository,
-            new[]
-            {
-                "GetPermissionsForUserAsync",
-                "ListPermissionsAsync",
-                "GetEffectivePermissionsAsync"
-            },
-            new object?[] { userId },
-            ct
-        ).ConfigureAwait(false);
-
-        if (perms is null)
+        var perms = await _permissionRepository.ListForUserAsync(userId, ct).ConfigureAwait(false);
+        if (perms is null || perms.Count == 0)
             return false;
 
-        return perms.Contains(permission, StringComparer.OrdinalIgnoreCase);
+        // Comparaison : exact puis wildcard.
+        for (int i = 0; i < perms.Count; i++)
+        {
+            var code = perms[i].Code; // déjà normalisé côté Domaine
+
+            if (string.Equals(code, required, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (MatchesWildcard(code, required))
+                return true;
+        }
+
+        return false;
     }
 
     private static bool PassesAbac(Guid userId, string permission, AuthorizationContext? ctx)
@@ -76,8 +86,31 @@ public sealed class AuthorizationServiceIsAllowed
             return ctx.ResourceOwnerUserId.Value == userId;
         }
 
-        // Exemple tenant : si ton Domaine gère des permissions par tenant, tu peux ajouter ici une règle
-        // basée sur ctx.TenantId. On ne force rien tant que le contrat n'est pas stabilisé.
+        // Exemple tenant : si le Domaine gère des permissions par tenant,
+        // ajouter ici une règle basée sur ctx.TenantId.
         return true;
+    }
+
+    /// <summary>
+    /// Support minimal des wildcards suffixes :
+    /// - "*" autorise tout
+    /// - "admin.*" autorise "admin.read", "admin.write", etc.
+    /// </summary>
+    private static bool MatchesWildcard(string granted, string required)
+    {
+        if (string.IsNullOrWhiteSpace(granted)) return false;
+
+        granted = granted.Trim();
+
+        if (granted == "*")
+            return true;
+
+        if (!granted.EndsWith('*'))
+            return false;
+
+        var prefix = granted.TrimEnd('*');
+        if (prefix.Length == 0) return true;
+
+        return required.StartsWith(prefix, StringComparison.OrdinalIgnoreCase);
     }
 }

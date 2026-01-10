@@ -1,7 +1,7 @@
 # Interfaces exposées — Métier
 
-> **Dernière mise à jour :** 2026-01-09  
-> **Version des contrats :** 0.1.0 (Draft)  
+> **Dernière mise à jour :** 2026-01-10  
+> **Version des contrats :** 0.1.1 (Draft)  
 > **Responsable :** Équipe Métier  
 > **Règle de changement :** breaking change ⇒ nouvelle version majeure + REQ + note de migration
 
@@ -14,56 +14,69 @@ Un contrat non documenté est considéré comme **inexistant**.
 
 ### `IF-MET-AUTH-001` — Services Auth (credentials + tokens + autorisation)
 
-- **Statut :** 🚧 *Implémenté (première version) / à stabiliser (contrats repos)*
+- **Statut :** ✅ *Implémenté (v1) — dépendances typées*
 - **Responsabilité :**
   - Valider des identifiants (login/email + password)
   - Émettre des tokens (JWT + refresh token) et gérer la rotation
-  - Vérifier une permission pour un utilisateur (RBAC/permissions)
+  - Vérifier une permission pour un utilisateur (RBAC/permissions + ABAC minimal)
 - **Consommateurs :**
-  - `Breizh360.Api` (controllers `AuthController`, filtres d’autorisations)
-  - Tests/outils (à venir)
+  - `Breizh360.Api` (controllers `AuthController`, filtres d’autorisation)
 
-#### Contrat applicatif (API publique côté Métier)
+#### Contrats applicatifs (API publique côté Métier)
 
 - `AuthServiceValidateCredentials`
-  - `Task<AuthServiceValidateCredentialsResult<dynamic>> TryValidateAsync(string loginOrEmail, string password, CancellationToken ct = default)`
-  - `Task<dynamic> ValidateOrThrowAsync(string loginOrEmail, string password, CancellationToken ct = default)`
+  - `Task<AuthServiceValidateCredentialsResult<User?>> TryValidateAsync(string loginOrEmail, string password, CancellationToken ct = default)`
+  - `Task<User> ValidateOrThrowAsync(string loginOrEmail, string password, CancellationToken ct = default)`
+
 - `TokenService`
   - `Task<TokenPair> IssueAsync(Guid userId, IEnumerable<string>? roles = null, IEnumerable<string>? permissions = null, string? login = null, CancellationToken ct = default)`
   - `Task<TokenPair> RefreshAsync(Guid userId, string refreshToken, IEnumerable<string>? roles = null, IEnumerable<string>? permissions = null, string? login = null, CancellationToken ct = default)`
+
 - `AuthorizationServiceIsAllowed`
   - `Task<bool> IsAllowedAsync(Guid userId, string permission, AuthorizationContext? ctx = null, CancellationToken ct = default)`
 
-> **Note importante (à stabiliser)** : certaines dépendances repos sont actuellement injectées sous forme de `object`
-> et consommées en “best effort” (reflection) pour éviter un conflit de nom (`IUserRepository` AUTH vs USR).
-> Le contrat attendu doit être figé côté Domaine afin de supprimer `dynamic`/reflection.
+> **Note compatibilité** : `TokenService` et `AuthorizationServiceIsAllowed` conservent un constructeur `object` marqué `Obsolete`
+> uniquement pour ne pas casser les consommateurs existants. Les appels internes sont 100% typés (aucune reflection).
 
-#### Dépendances attendues (repositories)
+#### Dépendances attendues (repositories Domaine)
 
-Tant que la stabilisation n’est pas faite, les repositories doivent exposer **au moins une** des signatures/variantes suivantes :
+- **Credentials** : `IAuthUserRepository` (namespace `Breizh360.Domaine.Auth.Users`)
+  - `GetByLoginAsync(key, ct)`
+  - `GetByEmailAsync(key, ct)`
 
-- **User lookup (credentials)** : `GetByLoginOrEmailAsync` / `FindByLoginOrEmailAsync` / `GetByLoginAsync` / `GetByEmailAsync` (ou équivalents)
-- **Refresh tokens**
-  - Stockage : `CreateAsync` / `AddAsync` / `InsertAsync` / `StoreAsync` / `UpsertAsync`
-  - Validation/consommation (retour `bool`) : `ConsumeAsync` / `ValidateAsync` / `IsValidAsync` / `ExistsAsync` / `CheckAsync` / `CanRefreshAsync`
-- **Permissions**
-  - Direct : `IsAllowedAsync` / `HasPermissionAsync` / `CheckAsync` (retour `bool?`)
-  - Ou liste : `GetPermissionsForUserAsync` / `ListPermissionsAsync` / `GetEffectivePermissionsAsync`
+- **Refresh tokens** : `IRefreshTokenRepository` (namespace `Breizh360.Domaine.Auth.RefreshTokens`)
+  - `GetByTokenHashAsync(hash, ct)`
+  - `AddAsync(token, ct)`
+  - `UpdateAsync(token, ct)`
+
+- **Permissions** : `IPermissionRepository` (namespace `Breizh360.Domaine.Auth.Permissions`)
+  - `ListForUserAsync(userId, ct)`
+
+#### Règles Métier (résumé)
+
+- **Permissions** :
+  - exact match sur le code normalisé
+  - wildcard suffixe (ex : `admin.*`)
+  - ABAC minimal : suffixe `:own` ⇒ exige `AuthorizationContext.ResourceOwnerUserId == userId`
+- **Refresh tokens** :
+  - token opaque côté client
+  - stockage DB du **hash** uniquement
+  - `RefreshAsync` valide + révoque l’ancien token + crée un nouveau token (rotation)
 
 #### Erreurs (minimum)
 - `AuthExceptionInvalidCredentials` (identifiants invalides)
 - `AuthExceptionUserLocked` (compte verrouillé)
 - `SecurityTokenException` (refresh token invalide/expiré)
-- `InvalidOperationException` (contrats repos incomplets / méthode non trouvée)
+- `InvalidOperationException` (repository requis manquant)
 - `ArgumentException` (entrée invalide)
 
 #### Exemple (pseudo-code)
 ```csharp
 // Login
 var result = await authValidate.TryValidateAsync(login, password, ct);
-if (!result.Success) return Unauthorized();
+if (!result.IsValid || result.User is null) return Unauthorized();
 
-var pair = await tokenService.IssueAsync(result.UserId, roles, permissions, login, ct);
+var pair = await tokenService.IssueAsync(result.User.Id, roles, permissions, login, ct);
 return Ok(pair);
 ```
 
@@ -71,6 +84,7 @@ return Ok(pair);
   - `Breizh360.Metier/Auth/AuthServiceValidateCredentials.cs`
   - `Breizh360.Metier/Auth/TokenService.cs`
   - `Breizh360.Metier/Auth/AuthorizationServiceIsAllowed.cs`
+  - `Breizh360.Metier/Auth/AuthorizationContext.cs`
   - `Breizh360.Metier/Auth/02_contrat_jwt.md`
 
 ---
@@ -79,17 +93,18 @@ return Ok(pair);
 
 ### `IF-MET-USR-001` — Use-cases Users (liste / détail / update)
 
-- **Statut :** ⏳ *Backlog / Blocked (contrats listing/pagination à clarifier)*
+- **Statut :** ⛔ *Blocked* (contrat listing/pagination à figer)
 - **Responsabilité :**
   - Exposer les use-cases Users pour l’API (liste, détail, update)
   - Appliquer les règles métier (validations, invariants, autorisations)
 - **Consommateurs :** `Breizh360.Api`
-- **Contrat (draft, à figer) :**
-  - `ListAsync(...)` : liste paginée (contrat pagination + tri + filtres à définir)
-  - `GetAsync(UserId id, ...)`
-  - `UpdateAsync(UserId id, ...)` (maj profil)
+- **Dépendance de clarification :** `Docs/requests.md` → `USR-REQ-003`
 
-- **Erreurs :** (à compléter) `NotFound`, validation, forbidden
+- **Contrat (draft, à figer) :**
+  - `ListAsync(UserQuery query, CancellationToken ct = default)` : liste paginée
+  - `GetAsync(UserId id, CancellationToken ct = default)`
+  - `UpdateAsync(UserId id, UserUpdate cmd, CancellationToken ct = default)`
+
 - **Remise :** (à venir) `Breizh360.Metier/Users/...`
 
 ---
@@ -98,25 +113,11 @@ return Ok(pair);
 
 ### `IF-MET-NOTIF-001` — Use-cases Notifications (inbox persistée)
 
-- **Statut :** 🟡 *Ready* (inbox persistée acceptée via ADR-0002)
+- **Statut :** 🟡 *Ready côté Domaine/Data* — ⏳ *Backlog Métier*
 - **Responsabilité :**
-  - Créer/planifier des notifications (si inbox persistée)
+  - Créer/planifier des notifications
   - Gérer l’état (unread/read), retry, expiration, idempotence
-- **Consommateurs :** `Breizh360.Api` (hub + endpoints inbox si option activée)
-- **Contrat :** conforme au domaine `IF-NOTIF-001` + persistence `IF-DATA-NOTIF-001`
-- **Erreurs :** (à compléter)
+- **Consommateurs :** `Breizh360.Api` (hub + endpoints inbox)
+- **Dépendances :** `Docs/requests.md` → `NOTIF-REQ-006` (cadrage contrat inbox côté API)
+
 - **Remise :** (à venir) `Breizh360.Metier/Notifications/...`
-
-
-**API proposée (exemple)**
-```csharp
-namespace Breizh360.Metier.Notifications;
-
-public interface INotificationsService
-{
-    Task CreateAsync(NotificationToCreate cmd, CancellationToken ct = default);
-    Task<IReadOnlyList<NotificationDto>> ListAsync(NotificationQuery query, CancellationToken ct = default);
-    Task<int> GetUnreadCountAsync(UserId userId, CancellationToken ct = default);
-    Task MarkAsReadAsync(NotificationId id, CancellationToken ct = default);
-}
-```

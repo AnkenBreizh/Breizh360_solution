@@ -99,6 +99,32 @@
 
 ---
 
+### `USR-REQ-003` — Contrat listing/pagination Users (query + tri + filtres)
+- **De :** Métier
+- **À :** Domaine
+- **Owner :** Domaine
+- **Priorité :** P1
+- **Statut :** Ready
+- **Nécessaire pour :** `INIT-USR-001` / `USR`
+- **Date cible :** 2026-01-14
+- **Détails :**
+  - Ajouter un **contrat stable** de listing/pagination côté Domaine (à réutiliser par API/UI) :
+    - `UserQuery` (page, pageSize, tri, search, filtres)
+    - `PagedResult<User>` (items, totalCount, page, pageSize)
+  - Étendre `IUserRepository` avec un `ListAsync(UserQuery query, CancellationToken ct = default)` (ou équivalent).
+  - Définir les règles de tri (champs autorisés) + valeurs par défaut.
+- **Critères d’acceptation :**
+  - Contrat documenté dans `Breizh360.Domaine/interfaces.md` (section `IF-USR-...` mise à jour)
+  - Signatures stables + types réutilisables par Data (impl EF) et Métier (use-cases)
+- **Remise attendue :**
+  - `/Breizh360.Domaine/interfaces.md` (mise à jour IF-USR-001 ou nouvelle section dédiée)
+  - `/Breizh360.Domaine/Users/Repositories/IUserRepository.cs` (méthode de listing)
+  - `/Breizh360.Domaine/Users/Queries/UserQuery.cs` *(à créer)*
+  - `/Breizh360.Domaine/Common/PagedResult.cs` *(à créer si absent)*
+- **Historique :**
+  - 2026-01-10 : création (blocage Métier sur `USR-MET-001`)
+
+
 ## Demandes — NOTIF (Notifications)
 
 ### `NOTIF-REQ-001` — Contrat hubs/événements (noms + payloads)
@@ -229,3 +255,28 @@
 - **Remise attendue :**
   - `/Breizh360.Api/interfaces.md` (IF-API-NOTIF-001, IF-API-NOTIF-002)
   - `/Breizh360.Api/Notifications/...` (controllers/services/hub)
+
+### `NOTIF-REQ-006` — Spécification Inbox (pagination + unread + mark-read)
+- **De :** Métier
+- **À :** API
+- **Owner :** API
+- **Priorité :** P1
+- **Statut :** Ready
+- **Nécessaire pour :** `INIT-NOTIF-001` / `NOTIF`
+- **Date cible :** 2026-01-14
+- **Détails :**
+  - Figer la **spécification** des endpoints Inbox (sans implémentation obligatoire immédiate) :
+    - `GET /notifications/inbox` (pagination + tri + filtres minimum)
+    - `GET /notifications/inbox/unread-count`
+    - `POST /notifications/inbox/{id}/read` (ou équivalent)
+  - Définir le format de pagination (page/pageSize/totalCount/items) et les DTO exposés.
+  - Définir les erreurs (401/403/404) et les règles d’auth (claims/roles requis).
+- **Critères d’acceptation :**
+  - Contrat publié dans `Breizh360.Api/interfaces.md` (`IF-API-NOTIF-001`, `IF-API-NOTIF-002`)
+  - Exemples JSON utilisables côté UI + alignement avec modèle Domaine NOTIF
+- **Remise attendue :**
+  - `/Breizh360.Api/interfaces.md` (sections NOTIF)
+  - *(optionnel)* exemples `.http` ou collection Postman
+- **Historique :**
+  - 2026-01-10 : création (cadrage requis pour démarrer `NOTIF-MET-001`)
+
