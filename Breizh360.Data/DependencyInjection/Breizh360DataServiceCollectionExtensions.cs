@@ -1,29 +1,25 @@
-using Breizh360.Data.Auth.Repositories;
-using Breizh360.Domaine.Auth.Permissions;
-using Breizh360.Domaine.Auth.RefreshTokens;
-using Breizh360.Domaine.Auth.Roles;
-using Breizh360.Domaine.Auth.Users;
+using System;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Breizh360.Data.Auth.Repositories;
+using Breizh360.Domaine.Auth.Users;
+using Breizh360.Domaine.Auth.Roles;
+using Breizh360.Domaine.Auth.Permissions;
+using Breizh360.Domaine.Auth.RefreshTokens;
 
 namespace Breizh360.Data;
 
 /// <summary>
 /// Point d’entrée d’intégration DI pour la couche Données.
-/// <para>
-/// Objectif : rendre <c>Breizh360.Data</c> « plug-and-play » depuis la composition root
-/// (API / Worker / Gateway) : DbContext + repositories + garde-fous.
-/// </para>
+/// Fournit un enregistrement « plug-and-play » du DbContext et des repositories.
 /// </summary>
 public static class Breizh360DataServiceCollectionExtensions
 {
     /// <summary>
-    /// Enregistre <see cref="Breizh360DbContext"/> + repositories Auth (implémentations EF Core) dans la DI.
+    /// Enregistre <see cref="Breizh360DbContext"/> et les repositories Auth dans la DI.
     /// </summary>
-    /// <param name="services">Conteneur DI.</param>
-    /// <param name="configuration">Configuration (pour récupérer la connection string).</param>
-    /// <param name="configure">Options facultatives (nom de connection string, flags DEV...).</param>
     public static IServiceCollection AddBreizh360Data(
         this IServiceCollection services,
         IConfiguration configuration,
@@ -51,9 +47,9 @@ public static class Breizh360DataServiceCollectionExtensions
             services.AddDbContext<Breizh360DbContext>(db => ConfigureDb(db, cs, options));
         }
 
-        // Repositories Auth (⚠️ attention à l’ambiguïté IUserRepository dans la solution)
+        // Repositories Auth : enregistre explicitement UserRepository pour les deux interfaces
         services.AddScoped<IAuthUserRepository, UserRepository>();
-        services.AddScoped<IUserRepository>(sp => sp.GetRequiredService<IAuthUserRepository>());
+        services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRoleRepository, RoleRepository>();
         services.AddScoped<IPermissionRepository, PermissionRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
@@ -65,13 +61,11 @@ public static class Breizh360DataServiceCollectionExtensions
     {
         db.UseNpgsql(connectionString, npgsql =>
         {
-            // Sécurise le scénario où le DbContext est enregistré depuis un projet hôte.
             npgsql.MigrationsAssembly(typeof(Breizh360DbContext).Assembly.GetName().Name);
         });
 
         if (options.EnableDetailedErrors)
             db.EnableDetailedErrors();
-
         if (options.EnableSensitiveDataLogging)
             db.EnableSensitiveDataLogging();
     }

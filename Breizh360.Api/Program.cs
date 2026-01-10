@@ -66,6 +66,9 @@ var signingKey = jwtSection["SigningKey"];
 var issuer = jwtSection["Issuer"];
 var audience = jwtSection["Audience"];
 
+// Bind les options JWT dans un objet fort typé pour la génération des tokens
+builder.Services.Configure<JwtOptions>(jwtSection);
+
 if (string.IsNullOrWhiteSpace(signingKey) || signingKey.Length < 32)
   throw new InvalidOperationException("Jwt:SigningKey must be set and at least 32 chars.");
 if (string.IsNullOrWhiteSpace(issuer))
