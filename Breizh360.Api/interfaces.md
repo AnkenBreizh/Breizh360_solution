@@ -1,80 +1,65 @@
 # Interfaces exposées — API Métier
 
-> **Dernière mise à jour :** 2026-01-09  
-> **Version des contrats :** 0.1.0 (Draft)  
+> **Dernière mise à jour :** 2026-01-10  
+> **Version des contrats :** 0.1.0 (MVP)  
 > **Responsable :** Équipe API  
 > **Règle de changement :** breaking change ⇒ nouvelle version majeure + REQ + note de migration
 
-## Décisions (transverses)
-- **NOTIF** : ✅ Inbox persistée (voir `Docs/decisions/ADR-0002-notif-inbox.md`) → endpoints inbox + ack/read + unread count.
-- **USR** : périmètre exact des endpoints `/users` à préciser (pagination/filtre/roles).
-
-
-> Si un point reste flou : ouvrir une demande dans `/Docs/requests.md` (règle : interface non documentée = inexistante).
+## Points à trancher (non bloquants pour le MVP)
+- **NOTIF** : Inbox persistée ou non ? (impacte : ack/retry, idempotence, “read/unread”, stockage).  
+  ➜ MVP : `Ack(notificationId)` est **no-op** (réservé).
 
 ---
 
 ## USR (Users)
 
-### `IF-API-USR-001` — Endpoints `/users` (Draft)
-- **Responsabilité :** exposition des opérations utilisateur définies par le MVP (cf. `USR-API-001`).
-- **Consommateurs :** à renseigner (ex: Front, Admin, autres services).
-- **Auth :** à préciser (JWT, rôles/scopes).
-- **Contrat :** à compléter. Minimum recommandé :
-  - `GET /users` (pagination + filtre)
-  - `GET /users/{id}`
+### `IF-API-USR-001` — Endpoints `/users` (MVP)
+- **Responsabilité :** consultation des utilisateurs (read-only).
+- **Consommateurs :** UI / Admin (à préciser).
+- **Auth :** JWT Bearer, **[Authorize]**.
+- **Routes :**
+  - `GET /users?page=1&pageSize=20&q=...`
+    - `page` : int (≥1)
+    - `pageSize` : int (1..100)
+    - `q` : string (optionnel) filtre sur login/email (contains, case-insensitive)
+  - `GET /users/{id}` (`id` = GUID)
+- **Réponses :**
+  - `200` :
+    - `GET /users` → `UsersContractsUsersResponse` (page, pageSize, totalCount, items[])
+    - `GET /users/{id}` → `UsersContractsUserDetailsDto`
+  - `400` validation paramètres (format standard)
+  - `401/403` auth/authz
+  - `404` user not found (format standard)
 - **DTO :**
-  - `UserSummaryDto` (liste)
-  - `UserDetailsDto` (détail)
-- **Erreurs :**
-  - `400` validation
-  - `401/403` authz
-  - `404` user not found
-  - `500` erreur interne (format standard)
-- **Exemple :**
-```csharp
-// Exemple pseudo-code (à remplacer par DTO réels)
-public sealed record UserSummaryDto(Guid Id, string DisplayName);
-```
-- **Remise :** (chemin + commit/PR) — ex: `Breizh360.Api/Users/...` @ `<ref>`
+  - `UsersContractsUserSummaryDto` : id, login, email, isActive, createdAt
+  - `UsersContractsUserDetailsDto` : id, login, email, isActive, createdAt, updatedAt, roleIds[]
+- **Erreurs :** `ErrorsApiError` (cf. middleware + InvalidModelState).
+- **Remise :**
+  - `Breizh360.Api/Controllers/UsersController.cs`
+  - `Breizh360.Api/Contracts/Users/*`
 
 ---
 
 ## NOTIF (Notifications)
 
-### `IF-API-NOTIF-001` — Hub SignalR + événements (Draft)
-- **Responsabilité :** diffusion temps réel de notifications.
-- **Consommateurs :** à renseigner (ex: Front web/mobile).
-- **Auth :** à préciser (JWT, claims, groupes).
-- **Contrat :** à compléter. Minimum recommandé :
-  - Hub : `/hubs/notifications` (chemin à confirmer)
-  - Server → Client : `notification.received` (payload typé)
-  - Client → Server : `ack(notificationId)` + `markAsRead(notificationId)` (inbox persistée)
-- **Payload :**
-  - `NotificationDto` (id, type, message, createdAt, metadata)
-- **Erreurs / comportements :**
-  - Reconnexion, perte de messages, idempotence (selon décision inbox)
-- **Exemple :**
-```csharp
-// Exemple pseudo-code (à remplacer par DTO réels)
-public sealed record NotificationDto(Guid Id, string Type, string Message, DateTimeOffset CreatedAt);
-```
-- **Remise :** (chemin + commit/PR) — ex: `Breizh360.Api/Hubs/...` @ `<ref>`
-
-
-### `IF-API-NOTIF-002` — Endpoints Inbox (REST) + unread count (Draft)
-- **Responsabilité :** exposer l’historique et la synchronisation read/unread.
-- **Consommateurs :** UI.
-- **Auth :** JWT requis (utilisateur connecté).
-- **Routes (proposées) :**
-  - `GET /notifications?page=1&pageSize=50` → liste paginée
-  - `GET /notifications/unread-count` → compteur
-  - `POST /notifications/{id}/read` → marque 1 notification comme lue
-  - `POST /notifications/read-all` → marque toutes comme lues *(optionnel)*
-- **DTO :**
-  - `NotificationDto` (Id, Type, Message, CreatedAt, ReadAt?, Metadata?)
-- **Erreurs / comportements :**
-  - `404` si notification inexistante ou non accessible
-  - idempotence mark-as-read (répéter n’échoue pas)
-- **Remise :** `Breizh360.Api/Notifications/...` (controllers + services) + mise à jour contrat
-
+### `IF-API-NOTIF-001` — Hub SignalR + événements (MVP)
+- **Responsabilité :** diffusion temps réel de notifications (server → client).
+- **Consommateurs :** UI web/mobile (à préciser).
+- **Auth :** JWT Bearer (querystring `access_token` supporté pour SignalR) + **[Authorize]**.
+- **Hub :** `/hubs/notifications`
+- **Événement Server → Client :**
+  - Méthode : `notification.received`
+  - Payload : `NotificationsContractsNotificationDto` (id, type, message, createdAt, metadata?)
+- **Client → Server :**
+  - `Ack(notificationId)` : **no-op** (réservé à la future décision “inbox persistée”)
+- **Convention d’adressage :**
+  - Le client est inscrit au groupe `user:{userId}` lors de la connexion (userId issu du claim NameIdentifier).
+- **Endpoint HTTP de test (MVP) :**
+  - `POST /notifications/test` (auth requis) — émet une notification vers l’utilisateur courant.
+  - Requête : `NotificationsContractsTestNotificationRequest` (type, message, metadata?)
+  - Réponse : `202 Accepted` + `NotificationsContractsNotificationDto`
+- **Remise :**
+  - `Breizh360.Api/Hubs/NotificationsHub.cs`
+  - `Breizh360.Api/Services/NotificationsPublisher.cs`
+  - `Breizh360.Api/Controllers/NotificationsController.cs`
+  - `Breizh360.Api/Contracts/Notifications/*`
