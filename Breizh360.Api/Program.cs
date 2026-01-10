@@ -58,7 +58,7 @@ builder.Services.AddDbContext<Breizh360DbContext>(opt =>
 // Register repositories and services
 builder.Services.AddScoped<IAuthUserRepository, UserRepository>();
 builder.Services.AddScoped<AuthServiceValidateCredentials>();
-builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<ApiTokenService>();
 
 // --- JWT validation (autorité = API)
 var jwtSection = builder.Configuration.GetSection("Jwt");

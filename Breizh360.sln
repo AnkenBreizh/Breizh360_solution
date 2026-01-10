@@ -13,39 +13,25 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Breizh360.Metier", "Breizh3
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Breizh360.Domaine", "Breizh360.Domaine\Breizh360.Domaine.csproj", "{D414C2B4-DE78-4CC7-8689-2C9DA16AEB7C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Breizh360.Tests", "Breizh360.Tests\Breizh360.Tests.csproj", "{9F8E5EBF-F0FB-49D4-B978-62F2AC54C243}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Breizh360.UI", "Breizh360.UI\Breizh360.UI.csproj", "{C133DF2E-C97D-4C6E-B36D-2A7C805658D2}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projets de tests", "Projets de tests", "{2A52F517-A34B-4950-B931-1992EA4A58A5}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Breizh360.Api.Metier.Tests", "Breizh360.Api.Metier.Tests\Breizh360.Api.Metier.Tests.csproj", "{5E40EFEE-E497-948A-814E-D1BA0CD273F2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Breizh360.Data.Tests", "Breizh360.Data.Tests\Breizh360.Data.Tests.csproj", "{5FD5D9C8-0AF2-54D4-0194-8F51F8E88542}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Breizh360.Domaine.Tests", "Breizh360.Domaine.Tests\Breizh360.Domaine.Tests.csproj", "{868069C3-3D3A-5499-A25E-0DFDE442C897}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Breizh360.Gateway.Tests", "Breizh360.Gateway.Tests\Breizh360.Gateway.Tests.csproj", "{85E38357-CDC7-ABDA-9664-DE02462731C5}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Breizh360.Metier.Tests", "Breizh360.Metier.Tests\Breizh360.Metier.Tests.csproj", "{8B547A53-76A7-505A-A3BD-DE74740ADE35}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Breizh360.UI.Tests", "Breizh360.UI.Tests\Breizh360.UI.Tests.csproj", "{6CE4F0CB-B7EB-9691-701A-73E9F3DF1938}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs & Suivi", "Docs & Suivi", "{7D3B0D2C-1C0E-4B1B-9A4F-8E4B3B2F7E1A}"
 	ProjectSection(SolutionItems) = preProject
-		README.md = README.md
 		01_PROMPT_ResponsableSolution.txt = 01_PROMPT_ResponsableSolution.txt
-		Docs\onboarding.md = Docs\onboarding.md
-		Docs\rules.md = Docs\rules.md
-		Docs\initiatives.md = Docs\initiatives.md
-		Docs\requests.md = Docs\requests.md
-		Docs\interfaces_index.md = Docs\interfaces_index.md
-		Docs\risks.md = Docs\risks.md
-		Docs\feature_usr_b2b.md = Docs\feature_usr_b2b.md
-		Docs\feature_notif_b2b.md = Docs\feature_notif_b2b.md
-		Docs\decisions\README.md = Docs\decisions\README.md
 		Docs\decisions\ADR-0001-template.md = Docs\decisions\ADR-0001-template.md
+		Docs\feature_notif_b2b.md = Docs\feature_notif_b2b.md
+		Docs\feature_usr_b2b.md = Docs\feature_usr_b2b.md
+		Docs\initiatives.md = Docs\initiatives.md
+		Docs\interfaces_index.md = Docs\interfaces_index.md
+		Docs\onboarding.md = Docs\onboarding.md
+		README.md = README.md
+		Docs\decisions\README.md = Docs\decisions\README.md
+		Docs\requests.md = Docs\requests.md
+		Docs\risks.md = Docs\risks.md
+		Docs\rules.md = Docs\rules.md
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Breizh360.Tests", "Breizh360.Tests\Breizh360.Tests.csproj", "{AC6E75B5-D036-E801-C2A1-4CC6B9C1821C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -73,49 +59,17 @@ Global
 		{D414C2B4-DE78-4CC7-8689-2C9DA16AEB7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D414C2B4-DE78-4CC7-8689-2C9DA16AEB7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D414C2B4-DE78-4CC7-8689-2C9DA16AEB7C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9F8E5EBF-F0FB-49D4-B978-62F2AC54C243}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9F8E5EBF-F0FB-49D4-B978-62F2AC54C243}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9F8E5EBF-F0FB-49D4-B978-62F2AC54C243}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9F8E5EBF-F0FB-49D4-B978-62F2AC54C243}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C133DF2E-C97D-4C6E-B36D-2A7C805658D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C133DF2E-C97D-4C6E-B36D-2A7C805658D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C133DF2E-C97D-4C6E-B36D-2A7C805658D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C133DF2E-C97D-4C6E-B36D-2A7C805658D2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5E40EFEE-E497-948A-814E-D1BA0CD273F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5E40EFEE-E497-948A-814E-D1BA0CD273F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5E40EFEE-E497-948A-814E-D1BA0CD273F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5E40EFEE-E497-948A-814E-D1BA0CD273F2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5FD5D9C8-0AF2-54D4-0194-8F51F8E88542}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5FD5D9C8-0AF2-54D4-0194-8F51F8E88542}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5FD5D9C8-0AF2-54D4-0194-8F51F8E88542}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5FD5D9C8-0AF2-54D4-0194-8F51F8E88542}.Release|Any CPU.Build.0 = Release|Any CPU
-		{868069C3-3D3A-5499-A25E-0DFDE442C897}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{868069C3-3D3A-5499-A25E-0DFDE442C897}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{868069C3-3D3A-5499-A25E-0DFDE442C897}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{868069C3-3D3A-5499-A25E-0DFDE442C897}.Release|Any CPU.Build.0 = Release|Any CPU
-		{85E38357-CDC7-ABDA-9664-DE02462731C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{85E38357-CDC7-ABDA-9664-DE02462731C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{85E38357-CDC7-ABDA-9664-DE02462731C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{85E38357-CDC7-ABDA-9664-DE02462731C5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8B547A53-76A7-505A-A3BD-DE74740ADE35}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8B547A53-76A7-505A-A3BD-DE74740ADE35}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8B547A53-76A7-505A-A3BD-DE74740ADE35}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8B547A53-76A7-505A-A3BD-DE74740ADE35}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6CE4F0CB-B7EB-9691-701A-73E9F3DF1938}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6CE4F0CB-B7EB-9691-701A-73E9F3DF1938}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6CE4F0CB-B7EB-9691-701A-73E9F3DF1938}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6CE4F0CB-B7EB-9691-701A-73E9F3DF1938}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC6E75B5-D036-E801-C2A1-4CC6B9C1821C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC6E75B5-D036-E801-C2A1-4CC6B9C1821C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC6E75B5-D036-E801-C2A1-4CC6B9C1821C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC6E75B5-D036-E801-C2A1-4CC6B9C1821C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{5E40EFEE-E497-948A-814E-D1BA0CD273F2} = {2A52F517-A34B-4950-B931-1992EA4A58A5}
-		{5FD5D9C8-0AF2-54D4-0194-8F51F8E88542} = {2A52F517-A34B-4950-B931-1992EA4A58A5}
-		{868069C3-3D3A-5499-A25E-0DFDE442C897} = {2A52F517-A34B-4950-B931-1992EA4A58A5}
-		{85E38357-CDC7-ABDA-9664-DE02462731C5} = {2A52F517-A34B-4950-B931-1992EA4A58A5}
-		{8B547A53-76A7-505A-A3BD-DE74740ADE35} = {2A52F517-A34B-4950-B931-1992EA4A58A5}
-		{6CE4F0CB-B7EB-9691-701A-73E9F3DF1938} = {2A52F517-A34B-4950-B931-1992EA4A58A5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B97E0931-70CD-4EB1-A278-714D655F9DF4}

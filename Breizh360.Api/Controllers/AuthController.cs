@@ -19,9 +19,9 @@ namespace Breizh360.Api.Metier.Controllers;
 public sealed class AuthController : ControllerBase
 {
     private readonly AuthServiceValidateCredentials _authService;
-    private readonly TokenService _tokenService;
+    private readonly ApiTokenService _tokenService;
 
-    public AuthController(AuthServiceValidateCredentials authService, TokenService tokenService)
+    public AuthController(AuthServiceValidateCredentials authService, ApiTokenService tokenService)
     {
         _authService = authService;
         _tokenService = tokenService;
@@ -29,7 +29,7 @@ public sealed class AuthController : ControllerBase
 
     /// <summary>
     /// Login: renvoie access JWT + refresh token. Valide les identifiants via le service métier
-    /// puis délègue l’émission des tokens au <see cref="TokenService"/>.
+    /// puis délègue l’émission des tokens au <see cref="ApiTokenService"/>.
     /// </summary>
     [HttpPost("login")]
     [ProducesResponseType(typeof(AuthContractsTokenPairResponse), StatusCodes.Status200OK)]

@@ -1,9 +1,19 @@
-﻿using Breizh360.Domaine.Auth.Users;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Breizh360.Domaine.Auth.Users;
 
 namespace Breizh360.Data.Auth.Repositories;
 
-public sealed class UserRepository : IAuthUserRepository
+/// <summary>
+/// Implémentation EF Core des repositories utilisateurs. Cette version implémente à la fois
+/// <see cref="IAuthUserRepository"/> et l’alias historique <see cref="IUserRepository"/>
+/// afin de lever les problèmes de cast rencontrés lors de l’injection (cf. erreur CS0266).
+/// </summary>
+public sealed class UserRepository : IAuthUserRepository, IUserRepository
 {
     private readonly Breizh360DbContext _db;
 
