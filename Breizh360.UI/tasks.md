@@ -30,10 +30,10 @@ Backlog | Ready | In progress | Blocked | In review | Done
 ### `NOTIF-UI-001` — Abonnement hub + affichage notifications
 - **Owner :** UI
 - **Statut :** **Blocked** (contrat hub + proxy gateway à stabiliser)
-- **Dépendances :** `NOTIF-REQ-001` (Contrat hub/payload API) + `NOTIF-REQ-002` (Proxy Gateway hubs) + `INIT-AUTH-001` (auth/UI)
+- **Dépendances :** `NOTIF-REQ-001` (Contrat hub/payload API) + `NOTIF-REQ-002` (Proxy Gateway hubs) + `INIT-AUTH-001` (auth/UI) + `NOTIF-REQ-005` (endpoints inbox)
 - **Objectif :** se connecter au hub SignalR via Gateway et afficher les notifications (toast/center).
 - **Critères d’acceptation :**
-  - Service SignalR isolé derrière un contrat UI (voir `IF-NOTIF-001`).
+  - Service SignalR isolé derrière un contrat UI (voir `IF-UI-NOTIF-001`).
   - Reconnexion gérée (au minimum : retry simple + état connecté/déconnecté).
   - Affichage : toast + liste (mémoire) avec horodatage.
   - Gestion des erreurs (auth manquante, WS bloqué, payload invalide).

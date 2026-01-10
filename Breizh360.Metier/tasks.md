@@ -14,7 +14,7 @@
 - Use-cases à démarrer après stabilisation des contrats (notamment “liste/pagination”) et disponibilité côté Data.
 
 ### NOTIF
-- À activer uniquement si la persistance “inbox” est confirmée et que Data publie la persistance correspondante.
+- ✅ Inbox persistée confirmée (voir `Docs/decisions/ADR-0002-notif-inbox.md`) : activer use-cases + contrat `IF-MET-NOTIF-001` et dépendances Data/API.
 
 ## Backlog détaillé
 

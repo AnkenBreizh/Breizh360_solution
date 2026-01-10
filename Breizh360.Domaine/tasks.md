@@ -37,6 +37,14 @@
 
 ## NOTIF (Notifications)
 
-- `NOTIF-DOM-001` — (optionnel) Modèle inbox / persistance — ⏳ **À décider**
-  - Dépendance : décision d’architecture (NOTIF persisté ou non)
-  - Si validé : ajout entités + repository NOTIF + contrat `IF-NOTIF-001`
+- `NOTIF-DOM-001` — Modèle inbox **persistée** (entités + repository + contrat) — 🟡 **Ready**
+  - **Décision :** ✅ Inbox persistée (voir `Docs/decisions/ADR-0002-notif-inbox.md`)
+  - **Objectif :** permettre l’historique, l’unread count, l’ack/read, la rejouabilité (si nécessaire).
+  - **Contrat :** `IF-NOTIF-001` (déjà publié dans `Breizh360.Domaine/interfaces.md`)
+  - **Remise attendue (quand Done) :**
+    - `Breizh360.Domaine/Notifications/Entities/...`
+    - `Breizh360.Domaine/Notifications/ValueObjects/...` (si besoin)
+    - `Breizh360.Domaine/Notifications/Repositories/INotificationRepository.cs` *(ou nom équivalent)*
+    - mise à jour `Breizh360.Domaine/interfaces.md` (section `IF-NOTIF-001`) si signatures/erreurs évoluent
+  - **Dépendances :** `NOTIF-REQ-003` (contrat domaine final) / `NOTIF-REQ-004` (persistance Data)
+

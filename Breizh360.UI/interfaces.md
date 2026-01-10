@@ -41,7 +41,7 @@ public sealed record UserDetailsVm(Guid Id, string DisplayName, string Email);
 
 ## NOTIF (Notifications)
 
-### `IF-NOTIF-001` — Client UI Notifications (SignalR via Gateway)
+### `IF-UI-NOTIF-001` — Client UI Notifications (SignalR via Gateway)
 - **Statut :** Draft (bloqué tant que `NOTIF-REQ-001` + `NOTIF-REQ-002` ne sont pas Done)
 - **Responsabilité :** gérer la connexion au hub + exposer un flux d’événements consumable par l’UI.
 - **Consommateurs :** service d’affichage/toasts + center (`NOTIF-UI-001`).

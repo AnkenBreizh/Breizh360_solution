@@ -96,13 +96,27 @@ return Ok(pair);
 
 ## NOTIF (Notifications)
 
-### `IF-MET-NOTIF-001` — Use-cases Notifications (inbox persistée — si confirmée)
+### `IF-MET-NOTIF-001` — Use-cases Notifications (inbox persistée)
 
-- **Statut :** ⏳ *Backlog*
+- **Statut :** 🟡 *Ready* (inbox persistée acceptée via ADR-0002)
 - **Responsabilité :**
   - Créer/planifier des notifications (si inbox persistée)
   - Gérer l’état (unread/read), retry, expiration, idempotence
 - **Consommateurs :** `Breizh360.Api` (hub + endpoints inbox si option activée)
-- **Contrat :** (à compléter selon la décision d’architecture)
+- **Contrat :** conforme au domaine `IF-NOTIF-001` + persistence `IF-DATA-NOTIF-001`
 - **Erreurs :** (à compléter)
 - **Remise :** (à venir) `Breizh360.Metier/Notifications/...`
+
+
+**API proposée (exemple)**
+```csharp
+namespace Breizh360.Metier.Notifications;
+
+public interface INotificationsService
+{
+    Task CreateAsync(NotificationToCreate cmd, CancellationToken ct = default);
+    Task<IReadOnlyList<NotificationDto>> ListAsync(NotificationQuery query, CancellationToken ct = default);
+    Task<int> GetUnreadCountAsync(UserId userId, CancellationToken ct = default);
+    Task MarkAsReadAsync(NotificationId id, CancellationToken ct = default);
+}
+```

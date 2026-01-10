@@ -46,3 +46,11 @@ Dernière mise à jour : **2026-01-09**
 | DATA-052 | Tests contractuels Data | 🗑️ | (supprimé) | Le projet `Breizh360.Data.Tests` a été retiré du repo |
 | DATA-090 | Intégration DI (API/…) | ✅ | `Breizh360.Data/DependencyInjection/*` + appel côté hôte | `AddBreizh360Data(...)` |
 | DATA-091 | Index global des interfaces | ⏳ | `Docs/interfaces_index.md` | À valider avec Responsable Solution |
+
+### NOTIF (Inbox persistée)
+
+| ID | Sujet | Statut | Livrable / chemin attendu | Notes |
+|---:|---|:---:|---|---|
+| DATA-020 | EF Config — Notifications inbox (tables + index) | ⏳ | `Breizh360.Data/Notifications/Configurations/...` | Dépend de `NOTIF-REQ-004` + contrat `IF-NOTIF-001` |
+| DATA-021 | Migration Inbox notifications | ⏳ | `Breizh360.Data/Migrations/...` | Script/apply reproductible |
+| DATA-022 | Repositories NOTIF (EF) | ⏳ | `Breizh360.Data/Notifications/Repositories/...` | Implémenter repo conforme Domaine |

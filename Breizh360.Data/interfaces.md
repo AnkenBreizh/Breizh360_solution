@@ -115,3 +115,24 @@ Garantir la disponibilité des implémentations EF Core des interfaces de reposi
 - Composition root (API/Gateway/…) au-delà de l’appel à `AddBreizh360Data(...)`
 - Stratégie CI/CD d'application des migrations
 - Observabilité (logs/metrics) au niveau persistence (à définir globalement dans la solution)
+
+
+---
+
+## IF-DATA-NOTIF-001 — Persistance Inbox Notifications (Draft)
+
+**But**
+
+Persister l’inbox des notifications (historique + read/unread + indexation) conformément au contrat domaine `IF-NOTIF-001`.
+
+**Producteur** : `Breizh360.Data`  
+**Consommateurs** : `Breizh360.Metier`, `Breizh360.Api`, `Breizh360.Tests`
+
+**Portée**
+- Tables + index + contraintes (performance, unicité éventuelle)
+- Migrations EF Core reproductibles
+- Implémentation repository EF (conforme au contrat du domaine)
+
+**Remise attendue**
+- `Breizh360.Data/Notifications/...` (entities EF/configurations/repositories)
+- `Breizh360.Data/Migrations/...`

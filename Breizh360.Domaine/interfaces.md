@@ -62,9 +62,10 @@ await userRepository.AddAsync(user, ct);
 
 ## NOTIF (Notifications)
 
-### `IF-NOTIF-001` — Contrat domaine Notifications (Inbox persistée — Option A)
+### `IF-NOTIF-001` — Contrat domaine Notifications (Inbox persistée)
 
 - **Statut :** ✅ *Décision validée (Inbox persistée)* / 🚧 *Implémentation à faire*
+- **Décision :** `Docs/decisions/ADR-0002-notif-inbox.md`
 - **Responsabilité :**
   - Modéliser une **inbox de notifications persistée** (cycle de vie, retry, expiration)
   - Garantir la **traçabilité** (audit) et la **rejouabilité**

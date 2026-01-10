@@ -39,58 +39,6 @@
 
 ---
 
-## Demandes — AUTH (Authentification / Autorisation)
-
-### `AUTH-REQ-001` — Contrat API Auth + Me (routes + DTO + erreurs)
-- **De :** UI / Solution
-- **À :** API (+ Gateway si routage particulier)
-- **Priorité :** P1
-- **Statut :** Ready
-- **Contexte :**
-  - Les routes existent côté API (`/auth/*`, `/me`) mais retournent **501 Not Implemented**.
-  - La UI et les Tests ont besoin d’un **contrat stable** (DTO, codes d’erreur, claims) avant d’intégrer proprement.
-- **Besoin / livrable :**
-  - Documenter et stabiliser les contrats :
-    - `IF-API-AUTH-001` : `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout`
-    - `IF-API-ME-001` : `GET /me`
-  - Définir :
-    - schémas request/response (DTO actuels ou ajustés),
-    - codes d’erreur (400/401/403/500) + format `ErrorsApiError`,
-    - contenu des claims (roles, permissions, userId/login/email),
-    - règles de durée : `ExpiresInSeconds`, rotation refresh (oui/non), invalidation logout (oui/non).
-- **Critères d’acceptation :**
-  - Contrats publiés dans `Breizh360.Api/interfaces.md` (IF ci-dessus) + exemples de payload
-  - `Breizh360.Api/tasks.md` mis à jour avec tâches `AUTH-API-001` / `AUTH-API-002` et DoD clair
-- **Remise attendue :**
-  - `/Breizh360.Api/interfaces.md` (IF-API-AUTH-001 + IF-API-ME-001)
-  - `/Breizh360.Api/tasks.md` (AUTH-API-001 + AUTH-API-002)
-- **Historique :**
-  - 2026-01-09 : création
-
-### `AUTH-REQ-002` — Contrats Métier/Data pour Auth (services + repos, sans ambiguïté)
-- **De :** API / Solution
-- **À :** Métier + Données + Domaine
-- **Priorité :** P1
-- **Statut :** Backlog
-- **Contexte :**
-  - Les TODO côté API mentionnent un service Métier (validation credentials + émission/refresh tokens).
-  - Risque de collision de noms (`IUserRepository` “users” vs “auth”) et d’appels dynamiques/reflection.
-- **Besoin / livrable :**
-  - Clarifier et publier les interfaces consommées par API :
-    - service d’authentification (validate credentials),
-    - service token (issue/refresh/revoke),
-    - accès aux rôles/permissions de l’utilisateur.
-  - Convention de nommage : éviter les collisions (`IAuthUserRepository` vs `IUserRepository`, ou namespaces explicites).
-- **Critères d’acceptation :**
-  - Contrats publiés dans `Breizh360.Metier/interfaces.md` et/ou `Breizh360.Data/interfaces.md` (IF-…-AUTH-…)
-  - Les TODO API peuvent référencer des interfaces **typiées** (pas de reflection/dynamic)
-- **Remise attendue :**
-  - `/Breizh360.Metier/interfaces.md` (IF-MET-AUTH-…)
-  - `/Breizh360.Data/interfaces.md` (IF-DATA-AUTH-… si pertinent)
-- **Historique :**
-  - 2026-01-09 : création
-
-
 ## Demandes — USR (Users)
 
 ### `USR-REQ-001` — Contrat Domaine Users (entités + repos)
@@ -203,3 +151,62 @@
 - **Historique :**
   - 2026-01-09 : création
   - 2026-01-09 : complétée (besoins UI pour lever le blocage `NOTIF-UI-001`)
+
+
+### `NOTIF-REQ-003` — Contrat Domaine Inbox (entités + repository + erreurs)
+- **De :** Métier
+- **À :** Domaine
+- **Owner :** Domaine
+- **Priorité :** P1
+- **Statut :** Ready
+- **Nécessaire pour :** `INIT-NOTIF-001` / `NOTIF`
+- **Date cible :** 2026-01-12
+- **Détails :**
+  - Modèle domaine **inbox persistée** (read/unread, timestamps, type, payload)
+  - Repository (ex : `INotificationRepository`) + signatures stables
+  - Invariants (idempotence, clés fonctionnelles si besoin)
+- **Critères d’acceptation :**
+  - Contrat publié/complété dans `Breizh360.Domaine/interfaces.md` (`IF-NOTIF-001`)
+  - Remise = chemins des entités + repo + exceptions éventuelles
+- **Remise attendue :**
+  - `/Breizh360.Domaine/interfaces.md` (IF-NOTIF-001)
+  - `/Breizh360.Domaine/Notifications/...`
+
+### `NOTIF-REQ-004` — Persistance EF + migrations Inbox (tables + index + repo)
+- **De :** Domaine
+- **À :** Données
+- **Owner :** Données
+- **Priorité :** P1
+- **Statut :** Ready
+- **Nécessaire pour :** `INIT-NOTIF-001` / `NOTIF`
+- **Date cible :** 2026-01-15
+- **Détails :**
+  - Tables / index / contraintes (unicité, FK, performances)
+  - Migrations EF Core + snapshot à jour
+  - Implémentation repo EF (conforme au contrat Domaine)
+- **Critères d’acceptation :**
+  - Contrat publié dans `Breizh360.Data/interfaces.md` (`IF-DATA-NOTIF-001`)
+  - Migration reproductible (`dotnet ef migrations script` / apply)
+- **Remise attendue :**
+  - `/Breizh360.Data/interfaces.md` (IF-DATA-NOTIF-001)
+  - `/Breizh360.Data/Notifications/...`
+  - `/Breizh360.Data/Migrations/...`
+
+### `NOTIF-REQ-005` — Endpoints Inbox + unread count (REST) + intégration hub (ack/read)
+- **De :** UI
+- **À :** API
+- **Owner :** API
+- **Priorité :** P1
+- **Statut :** Backlog
+- **Nécessaire pour :** `INIT-NOTIF-001` / `NOTIF`
+- **Date cible :** 2026-01-19
+- **Détails :**
+  - Endpoints inbox (liste paginée, unread count, mark-as-read)
+  - Compléter le hub avec ack/read si nécessaire
+  - Définir erreurs, auth, et comportements (reconnexion)
+- **Critères d’acceptation :**
+  - Contrats publiés dans `Breizh360.Api/interfaces.md` (`IF-API-NOTIF-001`, `IF-API-NOTIF-002`)
+  - UI peut charger l’historique et synchroniser l’unread count
+- **Remise attendue :**
+  - `/Breizh360.Api/interfaces.md` (IF-API-NOTIF-001, IF-API-NOTIF-002)
+  - `/Breizh360.Api/Notifications/...` (controllers/services/hub)

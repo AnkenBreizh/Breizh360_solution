@@ -19,6 +19,22 @@
 4. **Aucune supposition inter-équipe** (tout ce qui est flou devient une demande)
 5. **Un blocage = une demande** dans `/Docs/requests.md`
 
+
+
+## Convention d’ID pour interfaces (anti-collision)
+Pour éviter les collisions entre équipes, un ID d’interface doit être préfixé par le **scope** :
+
+- `IF-DOM-...` : Domaine
+- `IF-DATA-...` : Données
+- `IF-MET-...` : Métier
+- `IF-API-...` : API
+- `IF-GATE-...` : Passerelle
+- `IF-UI-...` : UI
+- `IF-TEST-...` : Tests
+
+Exception tolérée : un contrat purement “transverse” explicitement décidé en ADR (ex : `IF-NOTIF-001` côté Domaine), mais **un seul propriétaire**.
+
+
 ## Workflow standard (statuts)
 Utiliser **les mêmes statuts** partout (initiatives, demandes, tâches), pour que le suivi reste lisible.
 

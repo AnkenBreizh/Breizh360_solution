@@ -15,3 +15,6 @@ Objectif : garder une trace **courte** et **durable** des décisions qui impacte
 
 ## Template
 Copier `ADR-0001-template.md`.
+
+## ADRs
+- `ADR-0002-notif-inbox.md` — Notifications : inbox persistée (Accepted)

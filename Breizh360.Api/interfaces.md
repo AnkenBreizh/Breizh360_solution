@@ -5,50 +5,14 @@
 > **Responsable :** Équipe API  
 > **Règle de changement :** breaking change ⇒ nouvelle version majeure + REQ + note de migration
 
-## Points à trancher (bloquants)
-- **AUTH** : rotation refresh + invalidation logout + durée tokens (impacte UI/Tests)
-- **NOTIF** : Inbox persistée ou non ? (impacte : ack/retry, idempotence, “read/unread”, stockage)
-- **USR** : Périmètre exact des endpoints `/users` (non exposés pour l’instant côté API)
+## Décisions (transverses)
+- **NOTIF** : ✅ Inbox persistée (voir `Docs/decisions/ADR-0002-notif-inbox.md`) → endpoints inbox + ack/read + unread count.
+- **USR** : périmètre exact des endpoints `/users` à préciser (pagination/filtre/roles).
+
 
 > Si un point reste flou : ouvrir une demande dans `/Docs/requests.md` (règle : interface non documentée = inexistante).
 
 ---
-
-## AUTH (Authentification / Autorisation)
-
-### `IF-API-AUTH-001` — Endpoints `/auth/*` (Draft)
-- **Routes :**
-  - `POST /auth/login` → `AuthContractsTokenPairResponse`
-  - `POST /auth/refresh` → `AuthContractsTokenPairResponse`
-  - `POST /auth/logout` → `204 NoContent` (ou `200` selon stratégie)
-- **DTO (actuel) :**
-  - `AuthContractsLoginRequest` : `loginOrEmail`, `password`
-  - `AuthContractsRefreshRequest` : `refreshToken`
-  - `AuthContractsTokenPairResponse` : `tokenType`, `accessToken`, `expiresInSeconds`, `refreshToken`
-- **Erreurs (format `ErrorsApiError`) :**
-  - `400` : validation (required/minlength)
-  - `401` : identifiants invalides / refresh invalide/expiré
-  - `500` : erreur interne
-- **Notes :**
-  - Les endpoints existent mais retournent actuellement `501 Not Implemented` (cf. TODO `AUTH-API-001`).
-  - Décision à documenter : rotation refresh, invalidation logout, durée de vie tokens.
-- **Remise :** `Breizh360.Api/Controllers/AuthController.cs` + `Breizh360.Api/Contracts/Auth/*`
-
-### `IF-API-ME-001` — Endpoint `/me` (Draft)
-- **Route :** `GET /me` → `MeContractsMeResponse`
-- **Auth :** `Authorization: Bearer <accessToken>` (JWT)
-- **DTO (actuel) :**
-  - `MeContractsMeResponse` : `userId`, `login`, `email`, `roles[]`, `permissions[]`
-- **Erreurs (format `ErrorsApiError`) :**
-  - `401` : token manquant/invalide
-  - `500` : erreur interne
-- **Notes :**
-  - Retourne actuellement `501 Not Implemented` (cf. TODO `AUTH-API-002`).
-  - Source de vérité des claims : à préciser (role/perm, mapping userId/login/email).
-- **Remise :** `Breizh360.Api/Controllers/MeController.cs` + `Breizh360.Api/Contracts/Me/*`
-
----
-
 
 ## USR (Users)
 
@@ -85,7 +49,7 @@ public sealed record UserSummaryDto(Guid Id, string DisplayName);
 - **Contrat :** à compléter. Minimum recommandé :
   - Hub : `/hubs/notifications` (chemin à confirmer)
   - Server → Client : `notification.received` (payload typé)
-  - (Optionnel) Client → Server : `ack(notificationId)` si inbox persistée
+  - Client → Server : `ack(notificationId)` + `markAsRead(notificationId)` (inbox persistée)
 - **Payload :**
   - `NotificationDto` (id, type, message, createdAt, metadata)
 - **Erreurs / comportements :**
@@ -96,3 +60,21 @@ public sealed record UserSummaryDto(Guid Id, string DisplayName);
 public sealed record NotificationDto(Guid Id, string Type, string Message, DateTimeOffset CreatedAt);
 ```
 - **Remise :** (chemin + commit/PR) — ex: `Breizh360.Api/Hubs/...` @ `<ref>`
+
+
+### `IF-API-NOTIF-002` — Endpoints Inbox (REST) + unread count (Draft)
+- **Responsabilité :** exposer l’historique et la synchronisation read/unread.
+- **Consommateurs :** UI.
+- **Auth :** JWT requis (utilisateur connecté).
+- **Routes (proposées) :**
+  - `GET /notifications?page=1&pageSize=50` → liste paginée
+  - `GET /notifications/unread-count` → compteur
+  - `POST /notifications/{id}/read` → marque 1 notification comme lue
+  - `POST /notifications/read-all` → marque toutes comme lues *(optionnel)*
+- **DTO :**
+  - `NotificationDto` (Id, Type, Message, CreatedAt, ReadAt?, Metadata?)
+- **Erreurs / comportements :**
+  - `404` si notification inexistante ou non accessible
+  - idempotence mark-as-read (répéter n’échoue pas)
+- **Remise :** `Breizh360.Api/Notifications/...` (controllers + services) + mise à jour contrat
+
